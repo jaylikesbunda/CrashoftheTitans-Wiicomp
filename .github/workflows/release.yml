@@ -47,6 +47,20 @@ jobs:
       - name: Assemble the builder pack
         run: python tools/make_builder_pack.py --mingw "$env:RUNNER_TEMP\winlibs\mingw64"
 
+      # Cheap and early: the pack prunes dependency trees, so prove the remaining SDL2 source still configures with the
+      # toolchain the pack ships, before spending half an hour on the installer.
+      - name: Verify the pruned SDL2 source configures with the bundled toolchain
+        shell: pwsh
+        run: |
+          $bin = Join-Path (Get-Location) 'launcher/src-tauri/builder-pack/toolchain/mingw64/bin'
+          $sdl = Join-Path (Get-Location) 'launcher/src-tauri/builder-pack/deps/sdl2-src'
+          $env:PATH = "$bin;$env:PATH"
+          $env:CC = Join-Path $bin 'gcc.exe'
+          $env:CXX = Join-Path $bin 'c++.exe'
+          & (Join-Path $bin 'cmake.exe') -S $sdl -B (Join-Path $env:RUNNER_TEMP 'sdl-configure') -G Ninja `
+            -DSDL_SHARED=OFF -DSDL_STATIC=ON -DSDL_TEST_LIBRARY=OFF | Write-Host
+          if ($LASTEXITCODE -ne 0) { throw 'the pruned SDL2 source no longer configures with the bundled toolchain' }
+
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: Swatinem/rust-cache@v2
@@ -110,12 +124,6 @@ jobs:
           $have = (Get-Content (Join-Path $dir 'builder-pack/native-builder/builder-revision.json') | ConvertFrom-Json).revision
           $want = [regex]::Match((Get-Content tools/builder_revision.py -Raw), "REVISION='([^']+)'").Groups[1].Value
           if ($have -ne $want) { throw "pack revision $have does not match $want" }
-          $bin = Join-Path $dir 'builder-pack/toolchain/mingw64/bin'
-          $env:PATH = "$bin;$env:PATH"
-          $gcc = Join-Path $bin 'gcc.exe'
-          & (Join-Path $bin 'cmake.exe') -S (Join-Path $dir 'builder-pack/deps/sdl2-src') -B (Join-Path $env:RUNNER_TEMP 'sdl-configure') `
-            -G Ninja -DCMAKE_C_COMPILER=$gcc -DSDL_SHARED=OFF -DSDL_STATIC=ON -DSDL_TEST_LIBRARY=OFF | Write-Host
-          if ($LASTEXITCODE -ne 0) { throw 'the pruned SDL2 source no longer configures with the bundled toolchain' }
           $stats = Get-ChildItem $dir -Recurse -File | Measure-Object -Property Length -Sum
           Write-Host ("installed {0:N0} MB in {1} files" -f ($stats.Sum / 1MB), $stats.Count)
           if (Test-Path (Join-Path $dir 'uninstall.exe')) { Start-Process (Join-Path $dir 'uninstall.exe') -ArgumentList '/S' -Wait }
