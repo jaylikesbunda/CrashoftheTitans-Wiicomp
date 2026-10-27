@@ -1,6 +1,6 @@
 [package]
 name = "crash-launcher"
-version = "0.1.0"
+version = "0.1.1"
 description = "Launcher for the Crash of the Titans native port"
 edition = "2021"
 build = "build.rs"
