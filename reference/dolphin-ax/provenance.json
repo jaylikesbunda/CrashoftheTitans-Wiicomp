@@ -1,0 +1,103 @@
+{
+  "repository": "https://github.com/dolphin-emu/dolphin",
+  "commit": "562875dd60fd0ff50b65dbbb611a2096802cd1b9",
+  "license": "GPL-2.0-or-later",
+  "files": [
+    {
+      "file": "AudioInterface.cpp",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/AudioInterface.cpp",
+      "sha256": "614793f4868d4a3be07ee58ebbb9ba4fbbd9da4da4da68973df8131d9bdb0606",
+      "bytes": 11780
+    },
+    {
+      "file": "AX.cpp",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/AX.cpp",
+      "sha256": "18a5ce8ef4220d9559447f8ae93cff578df713e4113bfe534d2b936916f6a46a",
+      "bytes": 24456
+    },
+    {
+      "file": "AX.h",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/AX.h",
+      "sha256": "ee9d5d8da9a8796f85ea6eb2163fe46627423e75f5f6290773966fd35d05e661",
+      "bytes": 6110
+    },
+    {
+      "file": "AXStructs.h",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/AXStructs.h",
+      "sha256": "beae692c667d2c2c6f89a0783d382315007e39c3e9c15fe36fb22cd7d08b6113",
+      "bytes": 6199
+    },
+    {
+      "file": "AXVoice.h",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/AXVoice.h",
+      "sha256": "c1661f33d43ed3b34db7eb0c6ac04e737b77bef29950931a81da3cc5d9b56b2f",
+      "bytes": 18165
+    },
+    {
+      "file": "AXWii.cpp",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/AXWii.cpp",
+      "sha256": "bb89a48576520b2be79ba7b0256b0a9ce1969f5e82dc95d33b43937f1217d21e",
+      "bytes": 21521
+    },
+    {
+      "file": "AXWii.h",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/AXWii.h",
+      "sha256": "c28823720d14efdb7dca55a8ee2edea0c5c3e1e9b7f65ac58d8ab6da5d17802f",
+      "bytes": 3505
+    },
+    {
+      "file": "COPYING",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/COPYING",
+      "sha256": "695114256e306a5e1ca407bc6e2a11877b112328dbe990253b52f59726e01b4b",
+      "bytes": 494
+    },
+    {
+      "file": "DSP.cpp",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSP.cpp",
+      "sha256": "4339d47f9c052dd1bb95a107ae1702d0453bd76e440cd8b0ef440ed80eb273eb",
+      "bytes": 22043
+    },
+    {
+      "file": "DSPAccelerator.cpp",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/DSP/DSPAccelerator.cpp",
+      "sha256": "40d52c5727e691a663bcd71b6c779276041115f1a573b1b31414df09b01901ff",
+      "bytes": 8807
+    },
+    {
+      "file": "DSPAccelerator.h",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/DSP/DSPAccelerator.h",
+      "sha256": "5d1be8dcbb9fb7dcd8997666f23a9f2d4c3fd734395e9bdeb1257f16c4cd205d",
+      "bytes": 2848
+    },
+    {
+      "file": "dsp_coef.bin",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Data/Sys/GC/dsp_coef.bin",
+      "sha256": "d7741279c2e8ec5c5fb318f8fbdd6de6bf583520d288e836a5383233a4238179",
+      "bytes": 4096
+    },
+    {
+      "file": "Hash.cpp",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Common/Hash.cpp",
+      "sha256": "a66b941cf6a1f2ab8c30fc2a0491a1e473eabd37ec657ff5318f9ce23d3d3db5",
+      "bytes": 8911
+    },
+    {
+      "file": "Hash.h",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Common/Hash.h",
+      "sha256": "1307b53c335f3da9a5ebcc5440f3d6170e845fee244d2172de28fed112190f96",
+      "bytes": 613
+    },
+    {
+      "file": "UCodes.cpp",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/UCodes.cpp",
+      "sha256": "eb05907c21145c43785d699bf64e26da435daebce0c0da0adede8ca8acd5d16a",
+      "bytes": 7707
+    },
+    {
+      "file": "UCodes.h",
+      "upstream": "https://raw.githubusercontent.com/dolphin-emu/dolphin/562875dd60fd0ff50b65dbbb611a2096802cd1b9/Source/Core/Core/HW/DSPHLE/UCodes/UCodes.h",
+      "sha256": "26f688f58298db6c2e907d117104e2e93fbfa6a4328959d263e68cfd9a3d2b81",
+      "bytes": 4991
+    }
+  ]
+}

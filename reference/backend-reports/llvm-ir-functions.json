@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "purpose": "Admission set for the LLVM-IR hybrid backend: guest functions emitted as LLVM IR (native-port/compiler/emit_llvm_ir.py), compiled by clang/llvm-mingw and linked in place of their generated C++ definitions. Exclusion only w.r.t. the frozen benchmark; never training/retrieval/admission evidence for any other purpose.",
+  "note": "Add a function only after differential equivalence against the generated C++ is proven over randomised CPUContext state (the native-port/tools/check_llvm_slice.py method). Addresses must NOT appear in docs/frozen_500_spec.json nor in reference/guest-regions/effect-exclusions.json.",
+  "requirements": [
+    "Integer/register-only leaf: no ctx.fpr/ctx.ps1/ctx.require_fpu, no process_pending_callbacks or native_call_indirect, terminates in blr, acyclic internal branches only.",
+    "The MMU model in emit_llvm_ir.py matches the NativeWatchedRam build (base_ pointer in CPUContext); it is not valid for -DNWII_STATIC_RAM_BASE.",
+    "NWII_WATCH_PAGE_MARKING must be on (the default: CMakeLists.txt adds it to nwiiruntime PUBLIC)."
+  ],
+  "functions": [
+    "8023B080"
+  ]
+}

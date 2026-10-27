@@ -1,0 +1,199 @@
+{
+ "capture": "pmc-guest-batch-20261019 (exe 2eabbce7...)",
+ "dol_sha256": "a6119a43aa2bf2ce88c54142f106c04b65c9d3abd8d9258729d0adda7b0a676a",
+ "selection": "Functions with >= 20 timer samples in native_guest_resume_*/native_guest_continuation_* bodies; effect exclusions applied as a set filter. Continuation entries are chosen per function by tools/guest_poll_continuations.select (poll-site PCs + LR return PCs).",
+ "functions": [
+  {
+   "name": "func_803143EC",
+   "samples": 1186
+  },
+  {
+   "name": "func_803DB050",
+   "samples": 467
+  },
+  {
+   "name": "func_801B721C",
+   "samples": 260
+  },
+  {
+   "name": "func_802FDB74",
+   "samples": 150
+  },
+  {
+   "name": "func_80095B10",
+   "samples": 122
+  },
+  {
+   "name": "func_801B8B10",
+   "samples": 116
+  },
+  {
+   "name": "func_801B8E48",
+   "samples": 116
+  },
+  {
+   "name": "func_802A7CA0",
+   "samples": 106
+  },
+  {
+   "name": "func_802F71E0",
+   "samples": 86
+  },
+  {
+   "name": "func_802CB80C",
+   "samples": 85
+  },
+  {
+   "name": "func_802A3E44",
+   "samples": 83
+  },
+  {
+   "name": "func_8032A030",
+   "samples": 83
+  },
+  {
+   "name": "func_8022FCD8",
+   "samples": 79
+  },
+  {
+   "name": "func_80288ED4",
+   "samples": 73
+  },
+  {
+   "name": "func_8018960C",
+   "samples": 72
+  },
+  {
+   "name": "func_8006FA84",
+   "samples": 66
+  },
+  {
+   "name": "func_8031A628",
+   "samples": 62
+  },
+  {
+   "name": "func_801AA058",
+   "samples": 58
+  },
+  {
+   "name": "func_802ABC48",
+   "samples": 57
+  },
+  {
+   "name": "func_8034A8C4",
+   "samples": 54
+  },
+  {
+   "name": "func_80281C50",
+   "samples": 53
+  },
+  {
+   "name": "func_8039F4BC",
+   "samples": 51
+  },
+  {
+   "name": "func_801AA550",
+   "samples": 49
+  },
+  {
+   "name": "func_801A8B08",
+   "samples": 49
+  },
+  {
+   "name": "func_8034C664",
+   "samples": 46
+  },
+  {
+   "name": "func_8044AAF0",
+   "samples": 43
+  },
+  {
+   "name": "func_802F50EC",
+   "samples": 43
+  },
+  {
+   "name": "func_8005F36C",
+   "samples": 42
+  },
+  {
+   "name": "func_803181A0",
+   "samples": 41
+  },
+  {
+   "name": "func_801AABA4",
+   "samples": 40
+  },
+  {
+   "name": "func_802DCE40",
+   "samples": 35
+  },
+  {
+   "name": "func_8006132C",
+   "samples": 32
+  },
+  {
+   "name": "func_803078E8",
+   "samples": 32
+  },
+  {
+   "name": "func_80292510",
+   "samples": 31
+  },
+  {
+   "name": "func_80288BAC",
+   "samples": 30
+  },
+  {
+   "name": "func_801A7E6C",
+   "samples": 29
+  },
+  {
+   "name": "func_8028A7B4",
+   "samples": 28
+  },
+  {
+   "name": "func_801A4F14",
+   "samples": 28
+  },
+  {
+   "name": "func_80048514",
+   "samples": 27
+  },
+  {
+   "name": "func_8033EE54",
+   "samples": 27
+  },
+  {
+   "name": "func_802DC078",
+   "samples": 27
+  },
+  {
+   "name": "func_802F64C0",
+   "samples": 26
+  },
+  {
+   "name": "func_8006444C",
+   "samples": 25
+  },
+  {
+   "name": "func_802198C0",
+   "samples": 22
+  },
+  {
+   "name": "func_8019E364",
+   "samples": 21
+  },
+  {
+   "name": "func_802DBB98",
+   "samples": 20
+  },
+  {
+   "name": "func_800959E8",
+   "samples": 20
+  },
+  {
+   "name": "func_801A3120",
+   "samples": 20
+  }
+ ]
+}

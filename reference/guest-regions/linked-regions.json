@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "dol_sha256": "a6119a43aa2bf2ce88c54142f106c04b65c9d3abd8d9258729d0adda7b0a676a",
+  "roots": [
+    {
+      "name": "func_802DD268",
+      "callees": [
+        "func_803CCCB4",
+        "func_803CCD34",
+        "func_803CCD8C",
+        "func_803CCCF4",
+        "func_803CD120",
+        "func_803CCF54",
+        "func_803CCF04",
+        "func_803CD05C"
+      ],
+      "source_sha256": {
+        "func_802DD268": "61026cc9c8527686c73caa1e4dbc461688f80d02cdf8926f489da61837056206",
+        "func_803CCCB4": "57a027a8d07c15346f6f29dc81193b772ea3aff370b8cf8a459bde3cf82dacf6",
+        "func_803CCD34": "723d17603b0839b62d22755c5ad487c3151858e08c61a3dabe64f4307e4f486b",
+        "func_803CCD8C": "78caf9a1fdefaebf7f7b42b4195592b383821920a03aa98dc26cc33e94b6a28a",
+        "func_803CCCF4": "62a959011dfa8690fa25ba51d8f45b5ca43a3961b012b528d8dd9272ad325860",
+        "func_803CD120": "e825a609ff05dda37a1c8537bf240b2942e78f4e6391148cd76d167e200a0832",
+        "func_803CCF54": "586cbc524d58e864f2413d5b4470fc91bb8f23092bf4d3b6089cc8443513966d",
+        "func_803CCF04": "80e7760c2152a47ed824c7bbba28d9b7a3b56705dc031b1f2ae53a6d017c4038",
+        "func_803CD05C": "fa29e687fad9c399d51b11d0d6681e1a41ec1717945e71b7158dc3d830e9319d"
+      },
+      "qualification": "10000 exact state/RAM/FIFO comparisons against promoted root and real promoted leaves",
+      "commit_policy": "full architectural state at every former call/return"
+    },
+    {
+      "name": "func_803D79F8",
+      "callees": [
+        "func_803BCF00",
+        "func_803DEA3C",
+        "func_803DEA08",
+        "func_803D5CE8",
+        "func_803D6F90",
+        "func_803D8668",
+        "func_803D9E2C"
+      ],
+      "source_sha256": {
+        "func_803D79F8": "ee8dc97bdb4b75d738b4c48952c580823de0c65525463600b75a6766c6896503",
+        "func_803BCF00": "2b70d78913a6ab36847a7662ff89e033bf205656aed280e54bc3d73eda248c40",
+        "func_803DEA3C": "480225374045a6fb426ebf236335036e976cb4936a9554cf067bd9a6967f4c65",
+        "func_803DEA08": "89655a1e6336bacdb5fdbc4d964a944f944a94a01629c61bcfde15e6c4fe472f",
+        "func_803D5CE8": "f52628eb3085543798ecf3b4ba0f7e2ef3fbe55f785487170972076bfa398766",
+        "func_803D6F90": "83e3a0ab93385444c4f2ec5d9bb550d08fa7b3c9752f9990a9c3ef08caa53c59",
+        "func_803D8668": "94fa70927e31066d509a59588d5a7e1eb4618b25afbdc285b63e11910b6a12fc",
+        "func_803D9E2C": "1cd4311c2f1e4d6cb2ed34eb441b887cf1eb87391bdeb6ec69bba95b30ccd7c0"
+      },
+      "qualification": "10000 exact state/RAM/FIFO comparisons against promoted root and real promoted leaves",
+      "commit_policy": "full architectural state at every former call/return"
+    },
+    {
+      "name": "func_803CA650",
+      "callees": [
+        "func_803CDD8C",
+        "func_803CCBC8",
+        "func_803C9544",
+        "func_803C9AB8",
+        "func_803C95F4",
+        "func_803CDBC8",
+        "func_803CD918"
+      ],
+      "source_sha256": {
+        "func_803CA650": "147aad44101cc76abb06ae719f9d46db180ce8aff59f78e90fc47c13c6d97921",
+        "func_803CDD8C": "8398509acdae9820fbd4e10c00522532f75f710cf97bfbecc9e56a1c66668c05",
+        "func_803CCBC8": "2544daeccf9d10756c6311fba5d92c9c19aebe38affb55d5a26a8c6b9c50eee0",
+        "func_803C9544": "1fb405299c7ae1016eb0a0fa8313f15c3a974dcb9f72b64e67d8555756613554",
+        "func_803C9AB8": "956205c552c53683918baac14f87072a3d5c9990303052b74b2dae7a2f013773",
+        "func_803C95F4": "4e4d3c6d7328b9f28920c281b97dda293172edf8fbca896f895cc56fb8ef81c7",
+        "func_803CDBC8": "f6bf1fd54e23efd39e71c33b12f99fc8065fd491dabb87047f93e0b78fcd6dc9",
+        "func_803CD918": "255fb9cc1a5dbdc724a638ca8d78a928b063d8a9a780c77c37ab6fef4c5c32a7"
+      },
+      "qualification": "10000 exact state/RAM/FIFO comparisons against promoted root and real promoted leaves",
+      "commit_policy": "full architectural state at every former call/return"
+    },
+    {
+      "name": "func_802C5B7C",
+      "callees": [
+        "func_803C9B38",
+        "func_803C9720"
+      ],
+      "source_sha256": {
+        "func_802C5B7C": "8f9509cff9fb6a2514562225c01e41199f6c566a8108621ba53e2318f0bb169d",
+        "func_803C9B38": "4454925933f531c822481770e8826ed49575429efabfa630db07f4bbf94ced3b",
+        "func_803C9720": "3ebcaa5c6fa9ed1d28e64885bf32d4ab7a3fa0417085a3e328eca28e0cc932d1"
+      },
+      "qualification": "10000 exact state/RAM/FIFO comparisons against promoted root and real promoted leaves",
+      "commit_policy": "full architectural state at every former call/return"
+    }
+  ]
+}

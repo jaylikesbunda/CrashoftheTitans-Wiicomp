@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "comment": "Placeholder only. No hot root has been selected yet. To enable a region: replace root/owners/edges/max_depth together, set enabled to true, and add complete source_hashes and instruction_hashes produced by tools/fix_hot_region.py (source_hash/instruction_hash) from the same generated tree. Keep owners[0] equal to root. See the tools/fix_hot_region.py docstring for the full schema and invariants.",
+  "regions": [
+    {
+      "name": "example-placeholder-do-not-select",
+      "enabled": false,
+      "root": "80004000",
+      "owners": ["80004000", "8038F6B4"],
+      "edges": {"80004000": ["8038F6B4"]},
+      "max_depth": 1
+    }
+  ]
+}

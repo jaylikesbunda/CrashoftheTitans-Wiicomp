@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "dol_sha256": "a6119a43aa2bf2ce88c54142f106c04b65c9d3abd8d9258729d0adda7b0a676a",
+  "functions": [
+    "func_801A7E6C", "func_802C9B78", "func_802FDB74",
+    "func_803143EC", "func_8031A628", "func_803305C4"
+  ],
+  "scope": "Statically proven count-controlled RAM-to-FIFO loops only; preserve original slow and interior-entry paths. Source shape is rechecked on each build.",
+  "excluded": {
+    "func_80327CD0": "Full-function randomized context hangs in the unchanged original. Keep production unchanged until bounded full-function qualification exists.",
+    "func_801A8B08": "Full-parent synthetic timing was 1.583x original. This does not isolate the loop pass, but conservatively retain the existing path until an interleaved current-promoted versus loop benchmark qualifies it. State correctness passed."
+  }
+}

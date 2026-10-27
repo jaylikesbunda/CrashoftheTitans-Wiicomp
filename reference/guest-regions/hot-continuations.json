@@ -1,0 +1,69 @@
+{
+  "capture": "cpu-running-20261010-134133-407400",
+  "runtime_revision": "2026.10.10-3",
+  "dol_sha256": "a6119a43aa2bf2ce88c54142f106c04b65c9d3abd8d9258729d0adda7b0a676a",
+  "max_return_entries": 64,
+  "selection": "Top 12 non-frozen resume bodies with at least 20 exclusive samples; call-return entries are inferred from emitted LR literals, not directly measured entry frequencies.",
+  "functions": [
+    {
+      "name": "func_803143EC",
+      "samples": 441,
+      "guest_sample_share": 0.033962264150943396
+    },
+    {
+      "name": "func_803DB050",
+      "samples": 206,
+      "guest_sample_share": 0.015864458991143627
+    },
+    {
+      "name": "func_802FDB74",
+      "samples": 129,
+      "guest_sample_share": 0.00993453985367732
+    },
+    {
+      "name": "func_802DD268",
+      "samples": 70,
+      "guest_sample_share": 0.005390835579514825
+    },
+    {
+      "name": "func_801B721C",
+      "samples": 49,
+      "guest_sample_share": 0.0037735849056603774
+    },
+    {
+      "name": "func_802CB80C",
+      "samples": 42,
+      "guest_sample_share": 0.003234501347708895
+    },
+    {
+      "name": "func_8032A030",
+      "samples": 29,
+      "guest_sample_share": 0.0022333461686561418
+    },
+    {
+      "name": "func_801AA058",
+      "samples": 26,
+      "guest_sample_share": 0.0020023103581055064
+    },
+    {
+      "name": "func_801BB474",
+      "samples": 25,
+      "guest_sample_share": 0.0019252984212552945
+    },
+    {
+      "name": "func_8006FA84",
+      "samples": 25,
+      "guest_sample_share": 0.0019252984212552945
+    },
+    {
+      "name": "func_802CE7D8",
+      "samples": 24,
+      "guest_sample_share": 0.0018482864844050829
+    },
+    {
+      "name": "func_802ABC48",
+      "samples": 24,
+      "guest_sample_share": 0.0018482864844050829
+    }
+  ]
+}
