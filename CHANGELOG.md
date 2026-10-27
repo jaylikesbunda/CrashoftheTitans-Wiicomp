@@ -1,0 +1,45 @@
+# Changelog
+
+Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versions; the builder revision is a
+date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
+inputs is always rebuilt rather than reused.
+
+## [0.1.1] - 2026-10-28
+
+### Fixed
+
+- **The installer aborted while extracting the builder pack.** It shipped the entire SDL2 checkout, including
+  `deps/sdl2-src/android-project/ant/src/org/libsdl/app/HIDDevice.java`, and a single unreadable path stopped the install
+  with *"Error opening file for writing"*. The pack now carries only the trees a CMake build reads (`CMakeLists.txt`,
+  `cmake/`, `include/`, `src/`) and prunes SDL's `android-project`, `Xcode`, `VisualC`, `visualtest`, `docs` and
+  `.github`, plus the equivalent extras in toml++ and glad. Thousands of files leave the installer.
+
+### Changed
+
+- Tagged releases are published as stable ("Latest") unless the tag itself contains a hyphen (`v0.2.0-rc1`), instead of
+  every release being a pre-release.
+- Launcher `0.1.1`; builder revision `2026.10.28-1`.
+
+### Added
+
+- The release workflow now installs the installer it just built (silently), checks that the packaged builder pack is
+  complete, that the pruned trees are gone and that the pack revision matches, and re-configures the pruned SDL2 source
+  with the bundled toolchain — before anything is published.
+- `CHANGELOG.md`.
+
+## [0.1.0] - 2026-10-23
+
+### Added
+
+- First public pre-release: launcher `0.1.0`, builder `2026.10.23-10`. The runtime is compiled on the player's machine
+  from their own disc; no game code, recompiled code or linked binary is distributed.
+- PAL (`RQJP7D`) and NTSC USA (`RQJE7D`) support.
+- Two-player local co-op, Wii Remote + Nunchuk controls with motion and pointer aiming, per-player layouts.
+- Save states (F1 and **Play from here**), episode select including the PAL disc's unfinished test levels, soundtrack
+  export, 1x-4x internal resolution, 16:9, frame pacing and a shader cache.
+
+### Known issues
+
+- Save states do not load on the default (arena) build.
+- Performance on the reference machine (Ryzen 5 3600, RTX 3060, 2x internal, PAL): 75-100 FPS in most gameplay, about 60
+  in the busiest fights. The game thread is single-threaded and sets the pace.
