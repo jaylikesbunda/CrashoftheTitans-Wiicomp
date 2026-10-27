@@ -1,0 +1,34 @@
+# Fast checks on every push and pull request: pinned builder inputs, Python syntax and the launcher's unit tests.
+name: Checks
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Builder inputs match builder-revision.json
+        run: python tools/builder_revision.py
+
+      - name: Python sources compile
+        run: python -m compileall -q tools compiler launcher/scripts
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: launcher/src-tauri
+
+      - name: Launcher unit tests
+        working-directory: launcher/src-tauri
+        run: cargo test --lib -- --skip packaged_builder_matches_declared_inputs

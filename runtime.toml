@@ -1,0 +1,18 @@
+[system]
+platform = "Wii"
+[game]
+id = "RQJP7D"
+[graphics]
+backend = "OpenGL"
+resolution_scale = 2
+window_width = 960
+window_height = 720
+vsync = true
+[input]
+mode = 6
+
+# Crash SDK __OSDispatchInterrupt and OS scheduler-disable counter,
+# derived from original functions 803B9574, 803BBB2C and 803BBB68.
+[hle]
+ext_interrupt_dispatch = 0x803B9574
+sched_lock_offset = 0x2950

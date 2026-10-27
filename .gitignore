@@ -1,0 +1,81 @@
+# Game data and anything derived from it is never versioned.
+*.iso
+*.wbfs
+*.rvz
+*.wia
+*.ciso
+*.gcz
+*.dol
+*.rel
+*.rcf
+*.sav
+*.dtm
+*.raw
+/dump/
+/game/
+/reference/user/
+
+# Translated guest code. These are generated from the user's main.dol (or snapshot
+# it for a stage's baseline check) and contain recompiled game instructions.
+/runtime-overlays/bounded-blocks/
+/runtime-overlays/leaf-before-*.cpp
+/runtime-overlays/hot-before-*.cpp
+/runtime-overlays/hot_fp_bank_candidate.cpp
+/runtime-overlays/sdk_sqrt_baseline.cpp
+/runtime-overlays/sdk_sqrt_local_loops.inc
+
+# Upstream checkouts (see vendor/README.md) and build output.
+/vendor/*
+!/vendor/README.md
+/build/
+/preservation/
+
+# The parent decomp repository ignores every tools/ folder; here it is source.
+!/tools/
+CrashNative.exe
+*.exe
+*.dll
+*.o
+*.obj
+*.a
+*.pdb
+*.ll
+*.bc
+
+# Stage logs and check results.
+/reports/
+
+# Launcher build output and the locally assembled builder pack.
+/launcher/src-tauri/target/
+/launcher/src-tauri/gen/
+/launcher/src-tauri/builder-pack/
+
+# Runtime-local state.
+shader_cache/
+*.log
+*.dmp
+*.bmp
+*.wav
+state-census.txt
+*.arm
+
+# Python, editors, OS.
+__pycache__/
+*.py[cod]
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# Developer leftovers that nothing references (one carries a local path, one is a debug copy).
+/runtime-overlays/vector_plan_debug_backup.cpp
+/tools/llvm_module/run_module.py
+/tools/gdb/capture_sched_ring.py
+/tools/experimental/census_callee_effects.py
+/tools/experimental/check_callee_effects.py
+
+# Snapshots the stage scripts take of the runtime sources before patching them (written on first use, so each machine makes its own).
+/runtime-overlays/*-before*
+/runtime-overlays/*_baseline.*
+/tools/gdb/capture_callback_freeze.py

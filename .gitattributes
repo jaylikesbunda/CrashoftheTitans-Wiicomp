@@ -1,0 +1,3 @@
+# builder-revision.json pins the SHA-256 of the exact bytes of every build input, and the launcher re-checks them.
+# Store and check out every file byte for byte, without line-ending conversion.
+* -text
