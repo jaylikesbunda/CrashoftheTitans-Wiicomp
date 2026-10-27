@@ -53,12 +53,38 @@ assert head == PIN, f'vendor/NWiiRecomp is at {head}, expected {PIN}'
 (out / 'export').mkdir(parents=True)
 shutil.copy2(args.index, out / 'export/index.tsv')
 
+# Trees inside the dependency checkouts that a Windows CMake build never reads. SDL's android-project alone is thousands of
+# files, and it is where an installer once aborted with "Error opening file for writing" on
+# builder-pack/deps/sdl2-src/android-project/ant/src/org/libsdl/app/HIDDevice.java: pure installer weight, and the first thing
+# a scanner, a long path or a locked handle trips over. Keep what CMakeLists.txt reads: CMakeLists, cmake/, include/, src/.
+DEP_PRUNE = {
+    'sdl2-src': ('android-project', 'Xcode', 'VisualC', 'visualtest', 'docs', '.github'),
+    'tomlplusplus-src': ('docs', '.github', 'examples'),
+    'glad-src': ('.github', 'test', 'example'),
+}
+
+
+def drop_paths(root, names):
+    """Remove top-level entries from a checkout. Git packs are read-only on Windows, so retry through chmod."""
+    def retry(fn, path, err):
+        os.chmod(path, stat.S_IWRITE)
+        fn(path)
+    for name in names:
+        target = root / name
+        if target.is_dir(): shutil.rmtree(target, onexc=retry)
+        elif target.exists(): target.unlink()
+
+
 for dep, (url, tag) in DEPS.items():
+    dest = out / 'deps' / dep
+    prune = DEP_PRUNE.get(dep, ())
     if (args.deps / dep).is_dir():
-        shutil.copytree(args.deps / dep, out / 'deps' / dep, ignore=junk)
+        shutil.copytree(args.deps / dep, dest,
+                        ignore=lambda src, names, prune=prune: set(junk(src, names)) | (set(names) & set(prune)))
     else:
-        subprocess.run(['git', 'clone', '--depth', '1', '--branch', tag, url, str(out / 'deps' / dep)], check=True)
-        shutil.rmtree(out / 'deps' / dep / '.git', onexc=lambda fn, path, err: (os.chmod(path, stat.S_IWRITE), fn(path)))   # git packs are read-only on Windows
+        subprocess.run(['git', 'clone', '--depth', '1', '--branch', tag, url, str(dest)], check=True)
+        drop_paths(dest, ('.git',))
+        drop_paths(dest, prune)
 
 tc = out / 'toolchain'
 prune = ('lto-dump.exe', 'doxygen.exe', 'ctest.exe', 'cpack.exe', 'cmake-gui.exe', 'cppcheck*', 'gdb*', 'gfortran*', '*-gfortran.exe',
