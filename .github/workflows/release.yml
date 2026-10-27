@@ -74,6 +74,47 @@ jobs:
           Get-ChildItem dist/*.exe | ForEach-Object { "$((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
           Get-Content dist/SHA256SUMS.txt
 
+      # The installer extracts the builder pack (~900 MB) into %LOCALAPPDATA%. A single unreadable path aborts it (one release
+      # stopped on SDL's Android project), so install it silently here, check the pack, and only then publish anything.
+      - name: Install the built installer and verify the builder pack
+        shell: pwsh
+        run: |
+          $product = (Get-Content launcher/src-tauri/tauri.conf.json | ConvertFrom-Json).productName
+          $setup = Get-ChildItem dist/*.exe | Select-Object -First 1
+          Write-Host "Installing $($setup.Name) silently"
+          $p = Start-Process -FilePath $setup.FullName -ArgumentList '/S' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "installer exited with $($p.ExitCode)" }
+          $dir = Join-Path $env:LOCALAPPDATA $product
+          $need = @(
+            'builder-pack/native-builder/builder-revision.json',
+            'builder-pack/native-builder/tools/build_native.py',
+            'builder-pack/native-builder/tools/fix_direct_texcoord_loader.py',
+            'builder-pack/native-builder/runtime-overlays/native_texture_memo.h',
+            'builder-pack/deps/sdl2-src/CMakeLists.txt',
+            'builder-pack/deps/sdl2-src/src/SDL.c',
+            'builder-pack/deps/tomlplusplus-src/CMakeLists.txt',
+            'builder-pack/deps/glad-src/CMakeLists.txt',
+            'builder-pack/toolchain/mingw64/bin/g++.exe',
+            'builder-pack/toolchain/python/python.exe'
+          )
+          $missing = @($need | Where-Object { -not (Test-Path -LiteralPath (Join-Path $dir $_)) })
+          if ($missing.Count) { throw "installed pack is incomplete: $($missing -join ', ')" }
+          $pruned = @('builder-pack/deps/sdl2-src/android-project', 'builder-pack/deps/sdl2-src/Xcode', 'builder-pack/deps/sdl2-src/VisualC')
+          $kept = @($pruned | Where-Object { Test-Path -LiteralPath (Join-Path $dir $_) })
+          if ($kept.Count) { throw "pruned trees are still installed: $($kept -join ', ')" }
+          $have = (Get-Content (Join-Path $dir 'builder-pack/native-builder/builder-revision.json') | ConvertFrom-Json).revision
+          $want = [regex]::Match((Get-Content tools/builder_revision.py -Raw), "REVISION='([^']+)'").Groups[1].Value
+          if ($have -ne $want) { throw "pack revision $have does not match $want" }
+          $bin = Join-Path $dir 'builder-pack/toolchain/mingw64/bin'
+          $env:PATH = "$bin;$env:PATH"
+          $gcc = Join-Path $bin 'gcc.exe'
+          & (Join-Path $bin 'cmake.exe') -S (Join-Path $dir 'builder-pack/deps/sdl2-src') -B (Join-Path $env:RUNNER_TEMP 'sdl-configure') `
+            -G Ninja -DCMAKE_C_COMPILER=$gcc -DSDL_SHARED=OFF -DSDL_STATIC=ON -DSDL_TEST_LIBRARY=OFF | Write-Host
+          if ($LASTEXITCODE -ne 0) { throw 'the pruned SDL2 source no longer configures with the bundled toolchain' }
+          $stats = Get-ChildItem $dir -Recurse -File | Measure-Object -Property Length -Sum
+          Write-Host ("installed {0:N0} MB in {1} files" -f ($stats.Sum / 1MB), $stats.Count)
+          if (Test-Path (Join-Path $dir 'uninstall.exe')) { Start-Process (Join-Path $dir 'uninstall.exe') -ArgumentList '/S' -Wait }
+
       - uses: actions/upload-artifact@v4
         with:
           name: installer
@@ -84,5 +125,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*
-          prerelease: true
+          # A tag with a hyphen (v0.2.0-rc1) is a pre-release; v0.1.1 is stable and becomes "Latest".
+          prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
