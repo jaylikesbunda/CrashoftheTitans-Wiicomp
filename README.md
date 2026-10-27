@@ -13,7 +13,7 @@
 
 The game's code is translated from PowerPC to C++ with [NWiiRecomp](https://github.com/BlackLineInteractive/NWiiRecomp)
 and compiled with a high-level Wii runtime into a native program. It is not an emulator. Pre-release: launcher `0.1.0`,
-builder `2026.10.23-5`.
+builder `2026.10.23-10`.
 
 | Release | Disc ID | Status |
 | --- | --- | --- |
