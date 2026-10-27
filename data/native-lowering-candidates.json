@@ -1,0 +1,1165 @@
+{
+  "schema_version": 1,
+  "comment": "Source-backed native lowering candidates. Each adopted entry replaces one translated guest function with a host implementation written from the function's recovered C/C++ source. The stage keeps the translated body reachable under the name native_original_<address>, so an interior entry, a traced call or a disabled lowering keeps the original behaviour. A candidate with \"native_entry\": \"call_sites_only\" keeps the translated definition and only replaces the direct call sites that do not observe a guest register the native path does not reproduce (the excluded callers). The inventory of every candidate, with its provenance, verification evidence and rejection reason, is native-port/data/native-lowering-inventory.json.",
+  "dol_sha256": "a6119a43aa2bf2ce88c54142f106c04b65c9d3abd8d9258729d0adda7b0a676a",
+  "candidates": [
+    {
+      "address": "803CD2A0",
+      "symbol": "GXSetFog",
+      "implementation": "gx_set_fog",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[2]",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]",
+        "ctx.fpr[1]",
+        "ctx.fpr[2]",
+        "ctx.fpr[3]",
+        "ctx.fpr[4]",
+        "ctx"
+      ],
+      "result": "const bool preempted",
+      "publish": [
+        "if (preempted) { native_original_803CD2A0(ctx); return; }"
+      ],
+      "guards": [
+        "ctx.gqr[0] == 0"
+      ],
+      "reproduced_registers": [
+        "cr0",
+        "fpr0",
+        "fpr1",
+        "fpr2",
+        "fpr3",
+        "fpr31",
+        "fpr4",
+        "fpr5",
+        "fpr6",
+        "gpr0",
+        "gpr1",
+        "gpr10",
+        "gpr28",
+        "gpr29",
+        "gpr3",
+        "gpr30",
+        "gpr31",
+        "gpr4",
+        "gpr5",
+        "gpr6",
+        "gpr7",
+        "gpr8",
+        "gpr9",
+        "ps131"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_gx_tests.cpp",
+      "source": "src/external/ogws/revolution/GX/GXPixel.c",
+      "source_sha256": null,
+      "samples": 491,
+      "share_of_guest_samples": 0.011632039041955889,
+      "clobbered_registers": [
+        "cr0",
+        "fpr0",
+        "fpr1",
+        "fpr2",
+        "fpr3",
+        "fpr31",
+        "fpr4",
+        "fpr5",
+        "fpr6",
+        "gpr0",
+        "gpr10",
+        "gpr28",
+        "gpr29",
+        "gpr3",
+        "gpr30",
+        "gpr31",
+        "gpr4",
+        "gpr5",
+        "gpr6",
+        "gpr7",
+        "gpr8",
+        "gpr9",
+        "ps131"
+      ],
+      "volatile_not_reproduced": {},
+      "chunk": "output_76.cpp"
+    },
+    {
+      "address": "802880E8",
+      "symbol": "FUN_802880e8",
+      "samples": 300,
+      "share_of_guest_samples": 0.007107152164127834,
+      "provenance": "inferred from the translated code and the PPC mnemonics; no recovered source",
+      "implementation": "apply_802880e8",
+      "header": "runtime-overlays/native_lower_inferred.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "(ctx.msr & 0x2000u) != 0"
+      ],
+      "call_arguments": [
+        "ctx"
+      ],
+      "reproduced_registers": [
+        "cr0",
+        "fpr0",
+        "fpr1",
+        "fpr2",
+        "fpr3",
+        "fpr4",
+        "fpr5",
+        "fpr6",
+        "gpr3"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_inferred_tests.cpp",
+      "chunk": "output_49.cpp",
+      "source": null,
+      "source_sha256": null
+    },
+    {
+      "address": "803C9754",
+      "symbol": "GXSetVtxAttrFmt",
+      "implementation": "apply_gx_set_vtx_attr_fmt",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [],
+      "reproduced_registers": [
+        "cr0",
+        "gpr0",
+        "gpr3",
+        "gpr4",
+        "gpr5",
+        "gpr8"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_gx_tests.cpp",
+      "chunk": "output_76.cpp",
+      "source": "src/external/ogws/revolution/GX/GXAttr.c",
+      "source_sha256": "18a5bc37fc087421d6010b70412a6793969483a36f363676d060969d70f2c8ad",
+      "samples": 115
+    },
+    {
+      "address": "803C9B88",
+      "symbol": "GXSetTexCoordGen2",
+      "implementation": "apply_gx_set_tex_coord_gen2",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "native_lower::gx_set_tex_coord_gen2_serves(ctx.gpr[3], ctx.gpr[5])"
+      ],
+      "reproduced_registers": [
+        "cr0",
+        "gpr0",
+        "gpr3",
+        "gpr4",
+        "gpr5",
+        "gpr8",
+        "gpr9",
+        "gpr10",
+        "gpr11",
+        "gpr12"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_gx_tests.cpp",
+      "chunk": "output_76.cpp",
+      "source": "src/external/ogws/revolution/GX/GXAttr.c",
+      "source_sha256": "18a5bc37fc087421d6010b70412a6793969483a36f363676d060969d70f2c8ad",
+      "samples": 60
+    },
+    {
+      "address": "803CDA9C",
+      "symbol": "GXLoadNrmMtxImm",
+      "samples": 46,
+      "share_of_guest_samples": 0.0010897633318329345,
+      "source": "src/external/ogws/revolution/GX/GXTransform.c",
+      "source_sha256": "4eb74af177300d1295dbe539b973630ec6f570a95212774776c4a3cde4a7d11f",
+      "provenance": "src/external donor object (GC/3.0a5.2, hash-pinned)",
+      "exact_evidence": "manifest-recorded exact, not re-verified in this session: donor object revolution/GX/GXTransform.c (project ogws), compiler GC/3.0a5.2 (sha256 bfa9fd1794736e0a - the local tools/compilers/GC/3.0a5.2/mwcceppc.exe hashes to exactly this value), ordered flags -nodefaults -proc gekko -align powerpc -enum int -fp hardware -Cpp_exceptions off -O4,p -inline auto -pragma cats off -pragma warn_notinlined off -maxerrors 1 -nosyspath -RTTI off -fp_contract on -str reuse -i include -i include/MSL -i include/MSL/internal -i build/RSPE01_01/include -DBUILD_VERSION=0 -DVERSION_RSPE01_01 -ir include/revolution/BTE -DREVOLUTION -DNDEBUG=1 -enc SJIS -fp_contract off -ipa file, size 88, text_sha256 3c5071db94423e4c6eeb911a14a92fe9e466f85c956d8a1052b90a6677a459e5. The donor admission path cannot be re-run: scripts/match/admit_external_clusters.py, admit_recorded_donors.py and admit_whole_object.py were deleted in 7c441dd2c, the donor include tree and the prebuilt donor objects are not in this repository, so the donor source cannot be recompiled here. Independent check performed in this session: sha256(orig/main.dol bytes at 0x803CDA9C, size 88) == the manifest text_sha256.",
+      "exact_evidence_kind": "manifest-recorded exact",
+      "chunk": "output_76.cpp",
+      "implementation": "gx_load_nrm_mtx_imm",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "ctx.gqr[0] == 0"
+      ],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0",
+          "4",
+          "5"
+        ],
+        "fpr": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "ps1": [
+          "1",
+          "3",
+          "5"
+        ]
+      },
+      "exclude_callers": [],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_gx_tests.cpp",
+      "reproduced_registers": [],
+      "clobbered_registers": [
+        "fpr0",
+        "fpr1",
+        "fpr2",
+        "fpr3",
+        "fpr4",
+        "fpr5",
+        "gpr0",
+        "gpr4",
+        "gpr5",
+        "ps11",
+        "ps13",
+        "ps15"
+      ]
+    },
+    {
+      "address": "803CB590",
+      "symbol": "GXLoadLightObjImm",
+      "implementation": "apply_gx_load_light_obj_imm",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "(ctx.msr & 0x2000u) != 0",
+        "ctx.gqr[0] == 0"
+      ],
+      "reproduced_registers": [
+        "fpr0",
+        "fpr1",
+        "fpr2",
+        "fpr3",
+        "fpr4",
+        "fpr5",
+        "gpr0",
+        "gpr3",
+        "gpr4",
+        "gpr5",
+        "gpr6",
+        "ps10",
+        "ps11",
+        "ps12",
+        "ps13",
+        "ps14",
+        "ps15"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_gx_tests.cpp",
+      "chunk": "output_76.cpp",
+      "source": "src/external/petari/RVL_SDK/gx/GXLight.c",
+      "source_sha256": "9c2ae871362eb203be30a9b58cf184bbbd92b139b0b1a5c3ce7d25a68552a425",
+      "samples": 42
+    },
+    {
+      "address": "803CB7E0",
+      "symbol": "GXSetChanCtrl",
+      "samples": 37,
+      "share_of_guest_samples": 0.0008765487669090995,
+      "source": "src/external/petari/RVL_SDK/gx/GXLight.c",
+      "source_sha256": "9c2ae871362eb203be30a9b58cf184bbbd92b139b0b1a5c3ce7d25a68552a425",
+      "provenance": "src/external donor object (GC/3.0a3, hash-pinned)",
+      "exact_evidence": "manifest-recorded exact, not re-verified in this session: donor object RVL_SDK/gx/GXLight.c (project petari), compiler GC/3.0a3 (sha256 66553cf100ee7e17 - the local tools/compilers/GC/3.0a5.2/mwcceppc.exe hashes to exactly this value), ordered flags -nodefaults -proc gekko -align powerpc -enum int -fp hardware -Cpp_exceptions off -O4,p -inline auto,level=3 -pragma cats off -pragma warn_notinlined off -maxerrors 1 -nosyspath -RTTI off -str reuse -enc SJIS -ipa file -sdata 8 -sdata2 8 -i libs/MSL_C++/include -i libs/MSL_C/include -i libs/MetroTRK/include -i libs/RVLFaceLib/include -i libs/RVL_SDK/include -i libs/Runtime/include -i src/RVL_SDK/bte -i build/RMGK01/include -DVERSION=0 -ir libs/RVL_SDK/include/revolution/bte -DREVOLUTION, size 164, text_sha256 b9b926fe1e9b74e8f46d8da112a5903cd1398253792a652055cd4a56ab22e8f4. The donor admission path cannot be re-run: scripts/match/admit_external_clusters.py, admit_recorded_donors.py and admit_whole_object.py were deleted in 7c441dd2c, the donor include tree and the prebuilt donor objects are not in this repository, so the donor source cannot be recompiled here. Independent check performed in this session: sha256(orig/main.dol bytes at 0x803CB7E0, size 164) == the manifest text_sha256.",
+      "exact_evidence_kind": "manifest-recorded exact",
+      "chunk": "output_76.cpp",
+      "implementation": "gx_set_chan_ctrl",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[2]",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]",
+        "ctx.gpr[5]",
+        "ctx.gpr[6]",
+        "ctx.gpr[7]",
+        "ctx.gpr[8]",
+        "ctx.gpr[9]",
+        "ctx.xer"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[2]",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]",
+        "ctx.gpr[5]",
+        "ctx.gpr[6]",
+        "ctx.gpr[7]",
+        "ctx.gpr[8]",
+        "ctx.gpr[9]",
+        "ctx.xer"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0",
+          "10",
+          "11",
+          "4",
+          "5",
+          "8"
+        ],
+        "cr": [
+          "0"
+        ]
+      },
+      "exclude_callers": [
+        "802DBE70",
+        "802DC078",
+        "803C7CE8",
+        "804365CC",
+        "80436C84",
+        "804418A8",
+        "8046AD88",
+        "8046E498"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_gx_tests.cpp",
+      "reproduced_registers": [],
+      "clobbered_registers": [
+        "cr0",
+        "gpr0",
+        "gpr10",
+        "gpr11",
+        "gpr4",
+        "gpr5",
+        "gpr8"
+      ]
+    },
+    {
+      "address": "80231DFC",
+      "symbol": "FUN_80231dfc",
+      "samples": 31,
+      "share_of_guest_samples": 0.0007344057236265428,
+      "source": "src/c/c_80231dfc.c",
+      "source_sha256": "8a67ddefa7ceb7b4158c02c74a353e6c557c8602081a35c97f9fc0b47fcb5af0",
+      "provenance": "src/c recovered source (mwcc_42_142, -O4,p -proc gecko -fp hardware, strict-verified)",
+      "exact_evidence": "re-verified exact now: `python decomp.py verify 0x80231DFC` -> 0x80231DFC: exact  100.00%  size=0x2C cand=0x2C  time=196.5ms (MWCC 42.142, -O4,p -proc gecko -fp hardware; byte+size+relocation exact vs orig/main.dol)",
+      "exact_evidence_kind": "re-verified exact now",
+      "chunk": "output_42.cpp",
+      "implementation": "sda2_table_lookup",
+      "header": "runtime-overlays/native_lower_math.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[13]",
+        "ctx.gpr[3]"
+      ],
+      "result": "ctx.gpr[3]",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[13]",
+        "ctx.gpr[3]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0"
+        ],
+        "cr": [
+          "0"
+        ]
+      },
+      "exclude_callers": [
+        "80231BC8",
+        "802349A8"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_math_tests.cpp",
+      "reproduced_registers": [
+        "gpr3"
+      ],
+      "clobbered_registers": [
+        "cr0",
+        "gpr0",
+        "gpr3"
+      ]
+    },
+    {
+      "address": "803CDA4C",
+      "symbol": "GXLoadPosMtxImm",
+      "samples": 29,
+      "share_of_guest_samples": 0.000687024709199024,
+      "source": "src/external/ogws/revolution/GX/GXTransform.c",
+      "source_sha256": "4eb74af177300d1295dbe539b973630ec6f570a95212774776c4a3cde4a7d11f",
+      "provenance": "src/external donor object (GC/3.0a5.2, hash-pinned)",
+      "exact_evidence": "manifest-recorded exact, not re-verified in this session: donor object revolution/GX/GXTransform.c (project ogws), compiler GC/3.0a5.2 (sha256 bfa9fd1794736e0a - the local tools/compilers/GC/3.0a5.2/mwcceppc.exe hashes to exactly this value), ordered flags -nodefaults -proc gekko -align powerpc -enum int -fp hardware -Cpp_exceptions off -O4,p -inline auto -pragma cats off -pragma warn_notinlined off -maxerrors 1 -nosyspath -RTTI off -fp_contract on -str reuse -i include -i include/MSL -i include/MSL/internal -i build/RSPE01_01/include -DBUILD_VERSION=0 -DVERSION_RSPE01_01 -ir include/revolution/BTE -DREVOLUTION -DNDEBUG=1 -enc SJIS -fp_contract off -ipa file, size 80, text_sha256 cc6b4a890c58e6aa4b012c9af0b7d5ed7e6cc02f2a1d01c39379697a817e5e56. The donor admission path cannot be re-run: scripts/match/admit_external_clusters.py, admit_recorded_donors.py and admit_whole_object.py were deleted in 7c441dd2c, the donor include tree and the prebuilt donor objects are not in this repository, so the donor source cannot be recompiled here. Independent check performed in this session: sha256(orig/main.dol bytes at 0x803CDA4C, size 80) == the manifest text_sha256.",
+      "exact_evidence_kind": "manifest-recorded exact",
+      "chunk": "output_76.cpp",
+      "implementation": "gx_load_pos_mtx_imm",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "ctx.gqr[0] == 0"
+      ],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0",
+          "4",
+          "5"
+        ],
+        "fpr": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "ps1": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ]
+      },
+      "exclude_callers": [
+        "8021E8E4",
+        "802CB24C",
+        "803C7CE8"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_gx_tests.cpp",
+      "reproduced_registers": [],
+      "clobbered_registers": [
+        "fpr0",
+        "fpr1",
+        "fpr2",
+        "fpr3",
+        "fpr4",
+        "fpr5",
+        "gpr0",
+        "gpr4",
+        "gpr5",
+        "ps10",
+        "ps11",
+        "ps12",
+        "ps13",
+        "ps14",
+        "ps15"
+      ]
+    },
+    {
+      "address": "803CD4CC",
+      "symbol": "GXSetFogRangeAdj",
+      "implementation": "apply_gx_set_fog_range_adj",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [],
+      "reproduced_registers": [
+        "cr0",
+        "gpr0",
+        "gpr3",
+        "gpr4",
+        "gpr5",
+        "gpr6",
+        "gpr7",
+        "gpr8",
+        "gpr9",
+        "gpr10",
+        "gpr11",
+        "gpr12"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_gx_tests.cpp",
+      "chunk": "output_76.cpp",
+      "source": "src/external/ogws/revolution/GX/GXPixel.c",
+      "source_sha256": "0e3b8d50449c05b605a9485f355e97c817e5671a179daf3bfdb4c2f8c03478fb",
+      "samples": 29
+    },
+    {
+      "address": "803CD698",
+      "symbol": "GXSetZMode",
+      "samples": 27,
+      "share_of_guest_samples": 0.000639643694771505,
+      "source": "src/external/ogws/revolution/GX/GXPixel.c",
+      "source_sha256": "0e3b8d50449c05b605a9485f355e97c817e5671a179daf3bfdb4c2f8c03478fb",
+      "provenance": "src/external donor object (GC/3.0a5.2, hash-pinned)",
+      "exact_evidence": "manifest-recorded exact, not re-verified in this session: donor object revolution/GX/GXPixel.c (project ogws), compiler GC/3.0a5.2 (sha256 bfa9fd1794736e0a - the local tools/compilers/GC/3.0a5.2/mwcceppc.exe hashes to exactly this value), ordered flags -nodefaults -proc gekko -align powerpc -enum int -fp hardware -Cpp_exceptions off -O4,p -inline auto -pragma cats off -pragma warn_notinlined off -maxerrors 1 -nosyspath -RTTI off -fp_contract on -str reuse -i include -i include/MSL -i include/MSL/internal -i build/RSPE01_01/include -DBUILD_VERSION=0 -DVERSION_RSPE01_01 -ir include/revolution/BTE -DREVOLUTION -DNDEBUG=1 -enc SJIS -fp_contract off -ipa file, size 52, text_sha256 06b7a84ea385ffa3f285462ca27159fac06a406937c6279b7686574071570607. The donor admission path cannot be re-run: scripts/match/admit_external_clusters.py, admit_recorded_donors.py and admit_whole_object.py were deleted in 7c441dd2c, the donor include tree and the prebuilt donor objects are not in this repository, so the donor source cannot be recompiled here. Independent check performed in this session: sha256(orig/main.dol bytes at 0x803CD698, size 52) == the manifest text_sha256.",
+      "exact_evidence_kind": "manifest-recorded exact",
+      "chunk": "output_76.cpp",
+      "implementation": "gx_set_z_mode",
+      "header": "runtime-overlays/native_lower_gx.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[2]",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]",
+        "ctx.gpr[5]"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[2]",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]",
+        "ctx.gpr[5]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0",
+          "6",
+          "7",
+          "8",
+          "9"
+        ]
+      },
+      "exclude_callers": [
+        "804365CC"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_gx_tests.cpp",
+      "reproduced_registers": [],
+      "clobbered_registers": [
+        "gpr0",
+        "gpr6",
+        "gpr7",
+        "gpr8",
+        "gpr9"
+      ]
+    },
+    {
+      "address": "8028A914",
+      "symbol": "VectorX::Transform",
+      "implementation": "apply_vector_x_transform",
+      "header": "runtime-overlays/native_lower_vector.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "(ctx.msr & 0x2000u) != 0"
+      ],
+      "reproduced_registers": [
+        "fpr0",
+        "gpr0",
+        "gpr1",
+        "gpr3",
+        "gpr31",
+        "gpr4",
+        "gpr5"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_vector_tests.cpp",
+      "source": "src/master_match/c_8028a914.cpp",
+      "source_sha256": "c308bd6aebe25363b640d8e4a591afef4a552c89bde2911970348777e0f3bf23",
+      "samples": 26,
+      "share_of_guest_samples": 0.0006159531875577456,
+      "clobbered_registers": [
+        "fpr0",
+        "gpr0",
+        "gpr3",
+        "gpr31",
+        "gpr4",
+        "gpr5"
+      ],
+      "volatile_not_reproduced": {},
+      "chunk": "output_49.cpp"
+    },
+    {
+      "address": "803A2CC8",
+      "symbol": "atan",
+      "implementation": "apply_atan_double",
+      "header": "runtime-overlays/native_lower_vector.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "(ctx.msr & 0x2000u) != 0"
+      ],
+      "reproduced_registers": [
+        "fpr1",
+        "gpr0",
+        "gpr3",
+        "gpr4",
+        "gpr5",
+        "gpr6"
+      ],
+      "native_entry": "call_sites_only",
+      "exclude_callers": [
+        "8029C09C",
+        "8039FA18"
+      ],
+      "test": "native_lower_vector_tests.cpp",
+      "source": "src/external/petari/MSL_C/MSL_Common_Embedded/Math/Double_precision/s_atan.c",
+      "source_sha256": "f612998ec3926816364f18d5c3bdcf713e92d7c61202e90dd158753b7262f8a5",
+      "samples": 22,
+      "share_of_guest_samples": 0.0005211911587027078,
+      "clobbered_registers": [
+        "cr0",
+        "fpr0",
+        "fpr1",
+        "fpr10",
+        "fpr11",
+        "fpr12",
+        "fpr13",
+        "fpr2",
+        "fpr3",
+        "fpr4",
+        "fpr5",
+        "fpr6",
+        "fpr7",
+        "fpr8",
+        "fpr9",
+        "gpr0",
+        "gpr3",
+        "gpr4",
+        "gpr5",
+        "gpr6"
+      ],
+      "volatile_not_reproduced": {
+        "fpr": [
+          "0",
+          "10",
+          "11",
+          "12",
+          "13",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ],
+        "cr": [
+          "0"
+        ]
+      },
+      "chunk": "output_72.cpp",
+      "call_arguments": [
+        "ctx"
+      ]
+    },
+    {
+      "address": "802B6CF4",
+      "symbol": "FUN_802b6cf4",
+      "samples": 20,
+      "share_of_guest_samples": 0.00047381014427518893,
+      "source": "src/c/c_802b6cf4.c",
+      "source_sha256": "d2fea9d4fc3993acd500bbab6f78e6f81c682b52698dca2f16cee9e749521f9c",
+      "provenance": "src/c recovered source (mwcc_42_142, -O4,p -proc gecko -fp hardware, strict-verified)",
+      "exact_evidence": "re-verified exact now: `python decomp.py verify 0x802B6CF4` -> 0x802B6CF4: exact  100.00%  size=0x30 cand=0x30  time=173.2ms (MWCC 42.142, -O4,p -proc gecko -fp hardware; byte+size+relocation exact vs orig/main.dol)",
+      "exact_evidence_kind": "re-verified exact now",
+      "chunk": "output_53.cpp",
+      "implementation": "range_equal_probe",
+      "header": "runtime-overlays/native_lower_math.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "result": "ctx.gpr[3]",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0",
+          "5"
+        ],
+        "cr": [
+          "0"
+        ]
+      },
+      "exclude_callers": [
+        "8005D878",
+        "80097C4C",
+        "80098510",
+        "80098C0C",
+        "80098F00",
+        "80098FDC",
+        "80099110",
+        "800DD0BC",
+        "8017F138",
+        "80182EC4",
+        "801ACC60",
+        "801B6274",
+        "801B8E48",
+        "801FE170",
+        "80223344",
+        "802B74D4",
+        "8034B744"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_math_tests.cpp",
+      "reproduced_registers": [
+        "gpr3"
+      ],
+      "clobbered_registers": [
+        "cr0",
+        "gpr0",
+        "gpr3",
+        "gpr5"
+      ]
+    },
+    {
+      "address": "80219D40",
+      "symbol": "FUN_80219d40",
+      "implementation": "apply_indexed_int_load",
+      "header": "runtime-overlays/native_lower_vector.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [],
+      "reproduced_registers": [
+        "gpr0",
+        "gpr3"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_vector_tests.cpp",
+      "source": "src/master_match/c_80219d40.c",
+      "source_sha256": "c36641e3235258a38fa8fa0ed61a59eea25c1ca8e497977cc79bdd0ff771c22a",
+      "samples": 19,
+      "share_of_guest_samples": 0.0004501196370614295,
+      "clobbered_registers": [
+        "gpr0",
+        "gpr3"
+      ],
+      "volatile_not_reproduced": {},
+      "chunk": "output_40.cpp"
+    },
+    {
+      "address": "8026B00C",
+      "symbol": "FUN_8026b00c",
+      "implementation": "apply_sda2_global_swap",
+      "header": "runtime-overlays/native_lower_vector.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [],
+      "reproduced_registers": [
+        "gpr0",
+        "gpr3"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_vector_tests.cpp",
+      "source": "src/master_match/c_8026b00c.c",
+      "source_sha256": "c0707854bb1b69c80d13b6a806858121b8c5c3a074c00ecc863ae31327267f64",
+      "samples": 19,
+      "share_of_guest_samples": 0.0004501196370614295,
+      "clobbered_registers": [
+        "gpr0",
+        "gpr3"
+      ],
+      "volatile_not_reproduced": {},
+      "chunk": "output_47.cpp"
+    },
+    {
+      "address": "803B5988",
+      "symbol": "OSClearContext",
+      "samples": 14,
+      "share_of_guest_samples": 0.00033166710099263223,
+      "source": "src/external/ogws/revolution/OS/OSContext.c",
+      "source_sha256": "436719cfe1c72f4d2e72d7942d51f55db8f60dbb9cca04aaf1b2f34c4fed24a1",
+      "provenance": "src/external donor object (GC/3.0a5.2, hash-pinned)",
+      "exact_evidence": "manifest-recorded exact, not re-verified in this session: donor object revolution/OS/OSContext.c (project ogws), compiler GC/3.0a5.2 (sha256 bfa9fd1794736e0a - the local tools/compilers/GC/3.0a5.2/mwcceppc.exe hashes to exactly this value), ordered flags -nodefaults -proc gekko -align powerpc -enum int -fp hardware -Cpp_exceptions off -O4,p -inline auto -pragma cats off -pragma warn_notinlined off -maxerrors 1 -nosyspath -RTTI off -fp_contract on -str reuse -i include -i include/MSL -i include/MSL/internal -i build/RSPE01_01/include -DBUILD_VERSION=0 -DVERSION_RSPE01_01 -ir include/revolution/BTE -DREVOLUTION -DNDEBUG=1 -enc SJIS -fp_contract off -ipa file, size 36, text_sha256 26ee23eec8ca1a6ecc754cf96912dbd0558696d849d0f463ba2443df14678555. The donor admission path cannot be re-run: scripts/match/admit_external_clusters.py, admit_recorded_donors.py and admit_whole_object.py were deleted in 7c441dd2c, the donor include tree and the prebuilt donor objects are not in this repository, so the donor source cannot be recompiled here. Independent check performed in this session: sha256(orig/main.dol bytes at 0x803B5988, size 36) == the manifest text_sha256.",
+      "exact_evidence_kind": "manifest-recorded exact",
+      "chunk": "output_74.cpp",
+      "implementation": "os_clear_context",
+      "header": "runtime-overlays/native_lower_leaf.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]"
+      ],
+      "result": "",
+      "publish": [
+        "ctx.gpr[4] = 0x80000000u;",
+        "ctx.gpr[5] = 0u;"
+      ],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0"
+        ],
+        "cr": [
+          "0"
+        ]
+      },
+      "exclude_callers": [
+        "803B4570",
+        "803B7C18",
+        "803BB88C",
+        "803BFC38",
+        "803BFCF0",
+        "803BFF08",
+        "803C25F8",
+        "803C85F8",
+        "803CA4A4",
+        "803CA56C",
+        "803D5E80",
+        "803DECD4",
+        "803E41C0",
+        "803E8F84"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_leaf_tests.cpp",
+      "reproduced_registers": [
+        "gpr4",
+        "gpr5"
+      ],
+      "clobbered_registers": [
+        "cr0",
+        "gpr0",
+        "gpr4",
+        "gpr5"
+      ]
+    },
+    {
+      "address": "8028669C",
+      "symbol": "FillTranslate_",
+      "implementation": "apply_fill_translate",
+      "header": "runtime-overlays/native_lower_vector.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "(ctx.msr & 0x2000u) != 0"
+      ],
+      "reproduced_registers": [
+        "fpr0",
+        "fpr1",
+        "fpr2"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_vector_tests.cpp",
+      "source": "src/master_match/c_8028669c.c",
+      "source_sha256": "c859ca389185084d23be291a35a6c0fd2a7c0b527cb4c39fc87676d865fedaf8",
+      "samples": 14,
+      "share_of_guest_samples": 0.00033166710099263223,
+      "clobbered_registers": [
+        "fpr0",
+        "fpr1",
+        "fpr2"
+      ],
+      "volatile_not_reproduced": {},
+      "chunk": "output_49.cpp"
+    },
+    {
+      "address": "80321E38",
+      "symbol": "FUN_80321e38",
+      "samples": 11,
+      "share_of_guest_samples": 0.0002605955793513539,
+      "source": "src/c/c_80321e38.c",
+      "source_sha256": "8e1efcaf59f321aef60fc868380e5345f387610c2c852beab133cc4d43040dc6",
+      "provenance": "src/c recovered source (mwcc_42_142, -O4,p -proc gecko -fp hardware, strict-verified)",
+      "exact_evidence": "re-verified exact now: `python decomp.py verify 0x80321E38` -> 0x80321E38: exact  100.00%  size=0x24 cand=0x24  time=166.7ms (MWCC 42.142, -O4,p -proc gecko -fp hardware; byte+size+relocation exact vs orig/main.dol)",
+      "exact_evidence_kind": "re-verified exact now",
+      "chunk": "output_62.cpp",
+      "implementation": "object_flag_bit",
+      "header": "runtime-overlays/native_lower_math.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]"
+      ],
+      "result": "ctx.gpr[3]",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0",
+          "4"
+        ]
+      },
+      "exclude_callers": [],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_math_tests.cpp",
+      "reproduced_registers": [
+        "gpr3"
+      ],
+      "clobbered_registers": [
+        "gpr0",
+        "gpr3",
+        "gpr4"
+      ]
+    },
+    {
+      "address": "80292364",
+      "symbol": "FUN_80292364",
+      "samples": 6,
+      "share_of_guest_samples": 0.00014214304328255667,
+      "source": "src/c/c_80292364.c",
+      "source_sha256": "cb3798e3b0f617ef7c4b5c0f9ea010b8a7a8349534d92d74dcbf41cb13eaceec",
+      "provenance": "src/c recovered source (mwcc_42_142, -O4,p -proc gecko -fp hardware, strict-verified)",
+      "exact_evidence": "re-verified exact now: `python decomp.py verify 0x80292364` -> 0x80292364: exact  100.00%  size=0x24 cand=0x24  time=162.6ms (MWCC 42.142, -O4,p -proc gecko -fp hardware; byte+size+relocation exact vs orig/main.dol)",
+      "exact_evidence_kind": "re-verified exact now",
+      "chunk": "output_50.cpp",
+      "implementation": "store_byte_quad",
+      "header": "runtime-overlays/native_lower_math.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "(uint8_t)ctx.gpr[4]",
+        "(uint8_t)ctx.gpr[5]",
+        "(uint8_t)ctx.gpr[6]",
+        "(uint8_t)ctx.gpr[7]"
+      ],
+      "result": "ctx.gpr[3]",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "(uint8_t)ctx.gpr[4]",
+        "(uint8_t)ctx.gpr[5]",
+        "(uint8_t)ctx.gpr[6]",
+        "(uint8_t)ctx.gpr[7]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "4",
+          "8"
+        ]
+      },
+      "exclude_callers": [],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_math_tests.cpp",
+      "reproduced_registers": [
+        "gpr3"
+      ],
+      "clobbered_registers": [
+        "gpr3",
+        "gpr4",
+        "gpr8"
+      ]
+    },
+    {
+      "address": "8046616C",
+      "symbol": "FUN_8046616c",
+      "samples": 6,
+      "share_of_guest_samples": 0.00014214304328255667,
+      "source": "src/c/c_8046616c.c",
+      "source_sha256": "72713dc7376033db98626e014d472acde2dcee6d6df31e9f934d53feadb55862",
+      "provenance": "src/c recovered source (mwcc_42_142, -O4,p -proc gecko -fp hardware, strict-verified)",
+      "exact_evidence": "re-verified exact now: `python decomp.py verify 0x8046616C` -> 0x8046616C: exact  100.00%  size=0x28 cand=0x28  time=170.0ms (MWCC 42.142, -O4,p -proc gecko -fp hardware; byte+size+relocation exact vs orig/main.dol)",
+      "exact_evidence_kind": "re-verified exact now",
+      "chunk": "output_89.cpp",
+      "implementation": "lcg_step",
+      "header": "runtime-overlays/native_lower_math.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count"
+      ],
+      "result": "ctx.gpr[3]",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0",
+          "4",
+          "5"
+        ]
+      },
+      "exclude_callers": [
+        "804551A8",
+        "80461E60"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_math_tests.cpp",
+      "reproduced_registers": [
+        "gpr3"
+      ],
+      "clobbered_registers": [
+        "gpr0",
+        "gpr3",
+        "gpr4",
+        "gpr5"
+      ]
+    },
+    {
+      "address": "8028A974",
+      "symbol": "VectorX::Rotate",
+      "implementation": "apply_vector_rotate",
+      "header": "runtime-overlays/native_lower_vector.h",
+      "arguments": [
+        "ctx"
+      ],
+      "result": "",
+      "publish": [],
+      "guards": [
+        "(ctx.msr & 0x2000u) != 0"
+      ],
+      "reproduced_registers": [
+        "fpr0",
+        "gpr0",
+        "gpr1",
+        "gpr3",
+        "gpr31",
+        "gpr4",
+        "gpr5"
+      ],
+      "native_entry": "definition",
+      "exclude_callers": [],
+      "test": "native_lower_vector_tests.cpp",
+      "chunk": "output_49.cpp",
+      "samples": 5,
+      "source": "src/master_match/c_80286e28.cpp",
+      "source_sha256": "5330f6e1c6a1118df30a0346f1ef34630d504119d1e4edb4b9f9c525cc8c8d96",
+      "note": "the arithmetic source is the recovered Matrix::RotateVector; the wrapper structure is inferred from the translated body of 0x8028A974 - the recovered src/master_match/c_8028a974.cpp does not describe the guest function (it calls Matrix::Transform where the guest calls Matrix::RotateVector), so it is not claimed as exact here"
+    },
+    {
+      "address": "800D5370",
+      "symbol": "FUN_800d5370",
+      "samples": 4,
+      "share_of_guest_samples": 9.476202885503778e-05,
+      "source": "src/c/c_800d5370.c",
+      "source_sha256": "f276bb0f552f6d341b0d6aba8e9fae8d381c7df6b120b7469e17d43c7f75b47d",
+      "provenance": "src/c recovered source (mwcc_42_142, -O4,p -proc gecko -fp hardware, strict-verified)",
+      "exact_evidence": "re-verified exact now: `python decomp.py verify 0x800D5370` -> 0x800D5370: exact  100.00%  size=0x20 cand=0x20  time=184.8ms (MWCC 42.142, -O4,p -proc gecko -fp hardware; byte+size+relocation exact vs orig/main.dol)",
+      "exact_evidence_kind": "re-verified exact now",
+      "chunk": "output_15.cpp",
+      "implementation": "indexed_slot_load",
+      "header": "runtime-overlays/native_lower_math.h",
+      "arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "result": "ctx.gpr[3]",
+      "publish": [],
+      "guards": [],
+      "call_arguments": [
+        "native_lower::guest_mem(ctx)",
+        "ctx.inst_count",
+        "ctx.gpr[3]",
+        "ctx.gpr[4]"
+      ],
+      "volatile_not_reproduced": {
+        "gpr": [
+          "0"
+        ],
+        "cr": [
+          "0"
+        ]
+      },
+      "exclude_callers": [
+        "800D3B7C",
+        "800D4440",
+        "80106F60",
+        "80107B20"
+      ],
+      "native_entry": "call_sites_only",
+      "test": "native_lower_math_tests.cpp",
+      "reproduced_registers": [
+        "gpr3"
+      ],
+      "clobbered_registers": [
+        "cr0",
+        "gpr0",
+        "gpr3"
+      ]
+    }
+  ]
+}

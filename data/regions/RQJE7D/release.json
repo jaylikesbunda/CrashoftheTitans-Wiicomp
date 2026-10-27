@@ -1,0 +1,32 @@
+{
+  "game_id": "RQJE7D",
+  "name": "Crash of the Titans (USA)",
+  "region": "NTSC-U",
+  "dol_sha256": "7e562fcce7113b7fe55dff35c1872d8289ce7db3cf4e117067001e6e06875e8d",
+  "hle": {
+    "ext_interrupt_dispatch": "0x803B7EE4",
+    "sched_lock_offset": "0x2A28"
+  },
+  "text_overrides": {
+    "tools/fix_frame_limit.py": [
+      [
+        "C002A8B8",
+        "C002A890"
+      ],
+      [
+        "-22344",
+        "-22384"
+      ]
+    ],
+    "tools/check_frame_limit.py": [
+      [
+        "C002A8B8",
+        "C002A890"
+      ],
+      [
+        "-22344",
+        "-22384"
+      ]
+    ]
+  }
+}

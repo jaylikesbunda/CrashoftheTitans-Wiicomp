@@ -1,0 +1,12 @@
+[
+  {
+    "stage": "compile",
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "stage": "execute",
+    "exit_code": 0,
+    "output": "STATES 60039/60039 MATH 9971/9971 NAIVE_HLE_STATE_DIFFERENCES 1\nSpinning at PC: 0x803a379c LR: 0x81234560\nTIMING 0 US 58588 CHECKSUM 7647007854948602\nTIMING 1 US 54319 CHECKSUM 7647007854948602\nTIMING 2 US 251 CHECKSUM 7647007854948602\n"
+  }
+]

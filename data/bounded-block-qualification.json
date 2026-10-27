@@ -1,0 +1,10 @@
+{
+  "regions": 19336,
+  "checks": 13331072,
+  "failed_regions": 93,
+  "adopted": 11483,
+  "seconds": 717.1550000000134,
+  "game_launched": false,
+  "artifact": "<storage>\\backend-reports\\bounded-block-qualification.json",
+  "sha256": "be98d3f25db11b8f559bdd6fbab593667a55905807b04759f0660e8576a09a84"
+}

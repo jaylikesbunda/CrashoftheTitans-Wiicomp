@@ -1,0 +1,8 @@
+{
+  "count": 19336,
+  "instructions": 104149,
+  "functions": 5799,
+  "game_launched": false,
+  "artifact": "<storage>\\backend-reports\\bounded-block-candidates.json",
+  "sha256": "84d03c9ffa3a50151086dcbaa9bedc0805409ebcd1ab17f19ae9e932840a2b87"
+}

@@ -1,0 +1,14 @@
+{
+  "regions": 10367,
+  "instructions": 55580,
+  "functions": 4126,
+  "chunks": 92,
+  "selected_checks": 7114240,
+  "rejected_state_regions": 93,
+  "fp_regions_deferred": "All FP regions remain original: local lowering can alter NaN payload selection; sampling is insufficient proof",
+  "guard": "disabled flag; integer-only regions",
+  "fallback": "all original interior labels, operations and faults retained",
+  "game_launched": false,
+  "artifact": "C:\\Users\\deki\\.codex\\native-port-builds\\guest-opt-batch-20261020\\backend-reports\\bounded-block-adoption.json",
+  "sha256": "59622abddafc13091d44802278ed169fa5341e448caa2b9c11735d1c760c8296"
+}

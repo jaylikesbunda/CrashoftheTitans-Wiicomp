@@ -1,0 +1,27 @@
+[
+  {
+    "command": [
+      "g++",
+      "-std=c++20",
+      "-O2",
+      "-fwrapv",
+      "-fno-strict-aliasing",
+      "-ffp-contract=off",
+      "-static",
+      "-I",
+      "<repo>\\build\\nwii-full-source\\nWiiRuntime\\include",
+      "<storage>\\guest-leaf-tests\\test.cpp",
+      "-o",
+      "<storage>\\guest-leaf-tests\\test.exe"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "<storage>\\guest-leaf-tests\\test.exe"
+    ],
+    "exit_code": 0,
+    "output": "ACTUAL_FP_STATES 3008/3008\n"
+  }
+]

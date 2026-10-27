@@ -1,0 +1,17 @@
+{
+  "guarded": [
+    "8003AB9C",
+    "8010EAA0",
+    "80182CC8",
+    "80281608",
+    "802883CC",
+    "80303FF8",
+    "80352998",
+    "8038A4F0",
+    "8038A700"
+  ],
+  "rejected": [
+    "8033F8D8"
+  ],
+  "reason": "NaN payload differences: finite straight-line preflight or original function"
+}
