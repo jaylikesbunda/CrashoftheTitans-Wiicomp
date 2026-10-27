@@ -8,11 +8,12 @@ inputs is always rebuilt rather than reused.
 
 ### Fixed
 
-- **The installer aborted while extracting the builder pack.** It shipped the entire SDL2 checkout, including
-  `deps/sdl2-src/android-project/ant/src/org/libsdl/app/HIDDevice.java`, and a single unreadable path stopped the install
-  with *"Error opening file for writing"*. The pack now carries only the trees a CMake build reads (`CMakeLists.txt`,
-  `cmake/`, `include/`, `src/`) and prunes SDL's `android-project`, `Xcode`, `VisualC`, `visualtest`, `docs` and
-  `.github`, plus the equivalent extras in toml++ and glad. Thousands of files leave the installer.
+- **The installer aborted while extracting the builder pack.** It shipped the entire SDL2 checkout; the first release
+  stopped on `deps/sdl2-src/android-project/ant/src/org/libsdl/app/HIDDevice.java`, and SDL also ships a second Android
+  tree (`android-project-ant`) that Tauri's resource glob then reported as a missing file. The pack now carries only what
+  a CMake build reads (`CMakeLists.txt`, `cmake/`, `include/`, `src/`) and drops SDL's `android-project`,
+  `android-project-ant`, `Xcode`, `Xcode-iOS`, `VisualC`, `VisualC-GDK`, `VisualC-WinRT`, `visualtest`, `acinclude`,
+  `mingw`, `docs` and `.github`, plus the equivalent extras in toml++ and glad. SDL2 is down to 1,434 files.
 
 ### Changed
 

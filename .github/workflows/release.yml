@@ -99,7 +99,12 @@ jobs:
           )
           $missing = @($need | Where-Object { -not (Test-Path -LiteralPath (Join-Path $dir $_)) })
           if ($missing.Count) { throw "installed pack is incomplete: $($missing -join ', ')" }
-          $pruned = @('builder-pack/deps/sdl2-src/android-project', 'builder-pack/deps/sdl2-src/Xcode', 'builder-pack/deps/sdl2-src/VisualC')
+          $pruned = @(
+            'builder-pack/deps/sdl2-src/android-project', 'builder-pack/deps/sdl2-src/android-project-ant',
+            'builder-pack/deps/sdl2-src/Xcode', 'builder-pack/deps/sdl2-src/Xcode-iOS',
+            'builder-pack/deps/sdl2-src/VisualC', 'builder-pack/deps/sdl2-src/VisualC-GDK',
+            'builder-pack/deps/sdl2-src/VisualC-WinRT'
+          )
           $kept = @($pruned | Where-Object { Test-Path -LiteralPath (Join-Path $dir $_) })
           if ($kept.Count) { throw "pruned trees are still installed: $($kept -join ', ')" }
           $have = (Get-Content (Join-Path $dir 'builder-pack/native-builder/builder-revision.json') | ConvertFrom-Json).revision
