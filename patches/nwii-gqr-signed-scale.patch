@@ -1,0 +1,22 @@
+--- a/nWiiRuntime/include/runtime/cpu_context.h
++++ b/nWiiRuntime/include/runtime/cpu_context.h
+@@ -360,7 +360,8 @@
+     uint32_t gqr_val = gqr[I];
+     uint32_t ld_type = (gqr_val >> 16) & 0x7;
+     uint32_t ld_scale = (gqr_val >> 24) & 0x3F;
+-    float scale = std::pow(2.0f, -((int)ld_scale));
++    int signed_scale = (ld_scale & 32u) ? int(ld_scale) - 64 : int(ld_scale);
++    float scale = std::ldexp(1.0f, -signed_scale);
+ 
+     auto load_element = [&](uint32_t a) -> double {
+       switch (ld_type) {
+@@ -394,7 +395,8 @@
+     uint32_t gqr_val = gqr[I];
+     uint32_t st_type = gqr_val & 0x7;
+     uint32_t st_scale = (gqr_val >> 8) & 0x3F;
+-    float scale = std::pow(2.0f, (int)st_scale);
++    int signed_scale = (st_scale & 32u) ? int(st_scale) - 64 : int(st_scale);
++    float scale = std::ldexp(1.0f, signed_scale);
+ 
+     auto store_element = [&](uint32_t a, double val) {
+       switch (st_type) {
