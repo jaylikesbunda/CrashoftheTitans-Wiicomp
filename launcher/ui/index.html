@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crash Launcher</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="steps-dots" id="dots" hidden><span data-s="disc"></span><span data-s="prepare"></span><span data-s="build"></span><span data-s="play"></span></div>
+    <nav class="utils" id="utils">
+      <button data-util="music" title="Soundtrack"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg></button>
+      <button data-util="settings" title="Settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
+      <button data-util="episodes" title="Episodes"><svg viewBox="0 0 24 24"><path d="M5 20V4"/><path d="M5 5h12l-2.5 4L17 13H5"/></svg></button>
+      <button data-util="states" title="Save states"><svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg></button>
+      <button data-util="controls" title="Controls"><svg viewBox="0 0 24 24"><path d="M7 8h10a4 4 0 0 1 3.8 5.2l-.9 3a2.5 2.5 0 0 1-4.3.8L14 15h-4l-1.6 2a2.5 2.5 0 0 1-4.3-.8l-.9-3A4 4 0 0 1 7 8z"/><path d="M8 11v3M6.5 12.5h3"/></svg></button>
+      <button data-util="logs" title="Log"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg></button>
+      <button data-util="about" title="About"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- WELCOME -->
+    <section class="page center active" id="page-welcome">
+      <img class="big-logo wordmark" src="images/wiicomp.png" alt="Crash of the Titans WiiComp">
+      <h1>Welcome</h1>
+      <p class="lead">All you need is your own copy of Crash of the Titans (Wii, PAL or USA). The launcher prepares the game and builds the native version on this PC.</p>
+      <button class="play" id="getStarted"><span>Get started</span></button>
+      <p class="fine">Nothing is uploaded. Your disc is never modified.</p>
+    </section>
+
+    <!-- DISC -->
+    <section class="page center" id="page-disc">
+      <img class="mid-logo wordmark" src="images/wiicomp.png" alt="">
+      <h1>Choose your game disc</h1>
+      <p class="lead" id="isoText">Select your Crash of the Titans disc image (PAL or USA): ISO, WBFS, RVZ, WIA, CISO or GCZ.</p>
+      <div class="iso-meta" id="isoMeta" hidden></div>
+      <div class="actions">
+        <button class="btn big" id="pickIso">Choose disc image…</button>
+        <button class="play small" id="prepare" hidden><span id="prepareLabel">Continue</span></button>
+      </div>
+      <button class="link" id="skipPrepared" hidden>Use the game files I already prepared</button>
+    </section>
+
+    <!-- PREPARE -->
+    <section class="page center" id="page-prepare">
+      <img class="mid-logo wordmark" src="images/wiicomp.png" alt="">
+      <h1 id="prepTitle">Preparing your game</h1>
+      <p class="lead" id="prepLead">Extracting files from your disc and applying the title art. Keep the launcher open.</p>
+      <div class="bar wide-bar"><i id="prepFill"></i></div>
+      <div class="sub" id="prepText">Reading disc…</div>
+      <div class="actions"><button class="btn" id="prepBack" hidden>Back</button></div>
+    </section>
+
+    <!-- BUILD -->
+    <section class="page center" id="page-build">
+      <img class="mid-logo wordmark" src="images/wiicomp.png" alt="">
+      <h1 id="buildTitle">Building the native game</h1>
+      <p class="lead" id="runtimeText">This compiles the game for your PC from your disc. It runs once and can take a while; you can leave the launcher open in the background.</p>
+      <div class="bar wide-bar" id="buildBar" hidden><i id="buildFill"></i></div>
+      <div class="sub" id="buildText" hidden></div>
+      <div class="actions">
+        <button class="play small" id="buildRuntime" hidden><span id="buildLabel">Start build</span></button>
+        <button class="btn" id="buildBack" hidden>Back</button>
+      </div>
+    </section>
+
+    <!-- PLAY -->
+    <section class="page center" id="page-play">
+      <img class="big-logo wordmark" src="images/wiicomp.png" alt="Crash of the Titans WiiComp">
+      <div class="actions">
+        <button class="play" id="play" disabled><span id="playLabel">Play</span></button>
+        <button class="btn danger big" id="stop" hidden>Stop game</button>
+      </div>
+      <div class="hint" id="playHint"></div>
+      <button class="link resume" id="resumeLatest" hidden></button>
+      <div class="links">
+        <button class="link" id="changeDisc">Change disc</button>
+        <button class="link" id="rebuild">Rebuild game</button>
+      </div>
+    </section>
+
+    <!-- SOUNDTRACK -->
+    <section class="page util" id="page-music">
+      <div class="util-head">
+        <button class="back" data-back aria-label="Back">&larr;</button><h2>Soundtrack</h2>
+        <div class="row push"><div class="seg" id="mcat"><button data-v="favourites" title="Deki's favourites">&#9733; Favourites</button><button data-v="music">Music</button><button data-v="ambience">Ambience</button></div><button class="btn" id="exportAll">Export all</button></div>
+      </div>
+      <p class="note" id="musicNote"></p>
+      <div id="trackList" class="tracks"></div>
+      <div class="playerbar" id="playerbar" hidden>
+        <button class="pbtn" id="pplay" aria-label="Play or pause"><svg viewBox="0 0 24 24" id="picon"><path d="M8 5v14l11-7z"/></svg></button>
+        <div class="pinfo"><b id="ptitle"></b><span id="ptime">0:00</span></div>
+        <input type="range" id="pseek" min="0" max="1000" value="0" aria-label="Seek">
+        <div class="vol"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg><input type="range" class="volr" min="0" max="100" aria-label="Volume"></div>
+      </div>
+      <audio id="audio" preload="auto"></audio>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page util" id="page-settings">
+      <div class="util-head"><button class="back" data-back aria-label="Back">&larr;</button><h2>Settings</h2></div>
+
+      <div class="sgrid">
+      <nav class="snav" id="snav" aria-label="Settings sections">
+        <button data-sec="graphics" class="on">Graphics</button><button data-sec="input">Input</button><button data-sec="game">Game</button><button data-sec="compat">Compatibility</button><button data-sec="files">Files</button>
+      </nav>
+      <div class="sbody">
+      <div class="group" data-sec="graphics">
+        <h3>Graphics</h3>
+        <div class="set">
+          <div class="rl"><b>Internal resolution</b><small>Renders the original 640 x 528 image at a multiple: 1x is 528 lines, 2x 1056 (1080p screens), 3x 1584 (1440p screens), 4x 2112 (4K screens). 2x is recommended.</small></div>
+          <div class="rc"><div class="seg" id="scale">
+            <button data-v="1">1x · 540p</button><button data-v="2">2x · 1080p</button><button data-v="3">3x · 1440p</button><button data-v="4">4x · 4K</button>
+          </div></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Aspect ratio</b><small>16:9 makes the game lay out its menus and movies for a widescreen television (recommended). Applies at the next launch.</small></div>
+          <div class="rc"><div class="seg" id="aspect"><button data-v="4:3">4:3</button><button data-v="16:9">16:9</button></div></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Display mode</b><small>Borderless fills the screen at your desktop resolution. F11 switches while playing.</small></div>
+          <div class="rc"><div class="seg" id="dmode"><button data-v="windowed">Windowed</button><button data-v="borderless">Fullscreen</button></div></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Window size</b></div>
+          <div class="rc dims"><input type="number" id="ww" min="640" max="7680" step="10" aria-label="Window width"><span>&times;</span><input type="number" id="wh" min="480" max="4320" step="10" aria-label="Window height"></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Anisotropic filtering</b><small>Sharper textures on surfaces seen at a steep angle, such as floors.</small></div>
+          <div class="rc"><div class="seg" id="aniso"><button data-v="1">Off</button><button data-v="2">2x</button><button data-v="4">4x</button><button data-v="8">8x</button><button data-v="16">16x</button></div></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Frame rate limit</b><small>Custom 120 FPS is recommended. Regional uses PAL 50 / NTSC 59.94 FPS. Custom overrides video pacing. Gameplay uses an elapsed-time clock, but frame-based behaviour is unverified; it takes priority over Game speed. V-Sync can impose a lower limit.</small></div>
+          <div class="rc dims"><select id="frameLimitMode" aria-label="Frame rate limit mode"><option value="regional">Regional</option><option value="custom">Custom</option></select><input type="number" id="customFps" min="10" max="1000" step="0.01" value="120" aria-label="Custom FPS limit"><span>FPS</span></div>
+        </div>
+        <label class="set switch"><div class="rl"><b>Frame pacing</b><small>Uses more precise waits to help frames arrive consistently. Changes apply while playing and save automatically. Turn off to use the original timing method.</small></div><div class="rc"><input type="checkbox" id="framePacing"><span></span></div></label>
+        <label class="set switch"><div class="rl"><b>Smooth camera on platforms</b><small>Eases the camera between positions instead of snapping, which softens the motion during platform sections. Applies at the next launch.</small></div><div class="rc"><input type="checkbox" id="cameraGlide"><span></span></div></label>
+        <div class="set">
+          <div class="rl"><b>Camera glide duration</b><small>How long the camera takes to ease into its new position. Only used when smooth camera is on.</small></div>
+          <div class="rc dims"><input type="number" id="cameraGlideMs" min="100" max="500" step="10" value="200" aria-label="Camera glide duration in milliseconds"><span>ms</span></div>
+        </div>
+        <label class="set switch"><div class="rl"><b>V-Sync</b><small>Blocks presents on the display refresh. The port already paces to the game's video clock, so leave this off unless you see tearing.</small></div><div class="rc"><input type="checkbox" id="vsync"><span></span></div></label>
+      </div>
+
+      <div class="group" data-sec="input" hidden>
+        <h3>Input</h3>
+        <div class="set">
+          <div class="rl"><b>Control scheme</b><small id="modeNote"></small></div>
+          <div class="rc"><select id="mode">
+            <option value="2">Gamepad: Classic layout</option>
+            <option value="3">Gamepad: pointer assist</option>
+            <option value="4">Gamepad: full tilt (gyro)</option>
+            <option value="6">Keyboard and mouse</option>
+          </select></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Button prompts</b><small>Automatic switches between keyboard, Xbox and PlayStation prompts as you play. Prompts follow player 1's bindings. Prompt mode changes apply while playing.</small></div>
+          <div class="rc"><select id="prompts">
+            <option value="auto">Automatic</option>
+            <option value="xbox">Xbox</option>
+            <option value="playstation">PlayStation</option>
+            <option value="keyboard">Keyboard and mouse</option>
+            <option value="wii">Wii Remote (original)</option>
+          </select></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Pointer speed</b></div>
+          <div class="rc slide"><input type="range" id="pointer" min="0.2" max="3" step="0.1" aria-label="Pointer speed"><output id="pointerV"></output></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Gyro sensitivity</b></div>
+          <div class="rc slide"><input type="range" id="gyro" min="0.2" max="3" step="0.1" aria-label="Gyro sensitivity"><output id="gyroV"></output></div>
+        </div>
+      </div>
+
+      <div class="group" data-sec="game" hidden>
+        <h3>Game</h3>
+        <div class="set">
+          <div class="rl"><b>Language</b><small>Text and speech language. Applies at the next launch.</small></div>
+          <div class="rc"><select id="lang">
+            <option value="en">English</option>
+            <option value="fr">Fran&ccedil;ais</option>
+            <option value="de">Deutsch</option>
+            <option value="es">Espa&ntilde;ol</option>
+            <option value="it">Italiano</option>
+            <option value="nl">Nederlands</option>
+          </select></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Game speed</b><small>Runs the whole game faster than normal. 1.0x is the original speed.</small></div>
+          <div class="rc slide"><input type="range" id="speed" min="1" max="4" step="0.25" aria-label="Game speed"><output id="speedV"></output></div>
+        </div>
+      </div>
+
+      <div class="group" data-sec="compat" hidden>
+        <h3>Compatibility</h3>
+        <label class="set switch"><div class="rl"><b>Safe GPU sync</b><small>Makes the game wait for the renderer at each sync point (the older behaviour). Use it if you see flickering that goes away with it on.</small></div><div class="rc"><input type="checkbox" id="safe"><span></span></div></label>
+        <label class="set switch"><div class="rl"><b>Print frame rates to the log</b><small>The window title always shows new frames, presented frames and XFB copies per second.</small></div><div class="rc"><input type="checkbox" id="fpslog"><span></span></div></label>
+        <label class="set switch"><div class="rl"><b>Record performance workload</b><small>Records operation counts for optimization analysis, even with F3 hidden. Export with F4. Leave off for normal play.</small></div><div class="rc"><input type="checkbox" id="perfcensus"><span></span></div></label>
+        <label class="set switch"><div class="rl"><b>Record function and switch counts</b><small>Adds detailed attribution when workload recording is enabled. Leave off for timing captures.</small></div><div class="rc"><input type="checkbox" id="perf_histogram"><span></span></div></label>
+        <label class="set switch"><div class="rl"><b>Compact graphics commands</b><small>Faster graphics-command path. On by default; turn off only to compare. Save and restart the game to apply; F4 reports which mode is active.</small></div><div class="rc"><input type="checkbox" id="directfifo"><span></span></div></label>
+        <div class="set"><div class="rl"><b>Experimental graphics batching</b><small>Starts smaller batches while the renderer is waiting. Smaller batches can add processing overhead. Save and restart to compare; F4 reports the mode.</small></div><div class="rc"><select id="gxbatching" aria-label="Graphics batching"><option value="legacy">Original (16 KiB)</option><option value="adaptive8">Adaptive (8 / 16 KiB)</option><option value="adaptive4">Adaptive (4 / 16 KiB)</option><option value="fixed8">Fixed 8 KiB</option><option value="fixed4">Fixed 4 KiB</option></select></div></div>
+      </div>
+
+      <div class="group" data-sec="files" hidden>
+        <h3>Files</h3>
+        <div class="set">
+          <div class="rl"><b>Data folder</b><small><code id="dataDir"></code></small></div>
+          <div class="rc"><button class="btn" data-open="data">Open</button></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Saves</b></div>
+          <div class="rc"><button class="btn" data-open="profile">Open</button></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Custom runtime</b><small>Optional path to a CrashNative.exe to use instead of the one built from your disc.</small></div>
+          <div class="rc wide-in"><input type="text" id="rt" placeholder="path to CrashNative.exe" aria-label="Custom runtime path"></div>
+        </div>
+        <div class="set">
+          <div class="rl"><b>Prepared game files</b><small>Delete the files extracted from your disc. You can prepare them again at any time.</small></div>
+          <div class="rc"><button class="btn danger" id="reset">Delete</button></div>
+        </div>
+      </div>
+
+      </div>
+      </div>
+
+      <div class="savebar"><span id="saved"></span><button class="btn primary" id="save">Save settings</button></div>
+    </section>
+
+    <!-- CONTROLS -->
+    <section class="page util" id="page-controls">
+      <div class="util-head">
+        <button class="back" data-back aria-label="Back">&larr;</button><h2>Controls</h2>
+        <div class="row push"><span class="livepill" id="ctrlLive" hidden>Game running · changes apply live</span><span id="ctrlSaved"></span></div>
+      </div>
+
+      <div class="players" id="players"></div>
+      <p class="note players-note">Players follow the order controllers connect. A second controller can join while the game is running.</p>
+
+      <div class="mapper">
+        <div class="mapper-head">
+          <b id="mapTitle">Player 1</b><span class="muted" id="mapSub"></span>
+          <div class="row push"><span class="seg sm" id="mapDevice"><button data-v="pad" class="on">Controller</button><button data-v="kbm">Keyboard &amp; mouse</button></span><button class="btn tiny" id="mapReset">Reset to default</button></div>
+        </div>
+        <p class="note map-hint" id="mapHint">Click an input, then press the controller button for it. Press the controller to test: inputs light up as the game will see them.</p>
+        <div class="mapgrid" id="mapRows"></div>
+      </div>
+
+      <details class="group fold" id="motionFold">
+        <summary>Pointer &amp; motion</summary>
+        <div id="motionRows"></div>
+      </details>
+
+      <details class="group fold kb">
+        <summary>Keyboard &amp; mouse</summary>
+        <table class="map">
+          <tr><td>Move</td><td>W A S D</td></tr>
+          <tr><td>Point</td><td>Mouse</td></tr>
+          <tr><td>A / B</td><td>Left / right click</td></tr>
+          <tr><td>Confirm</td><td>Space</td></tr>
+          <tr><td>Start</td><td>Enter</td></tr>
+          <tr><td>D-pad</td><td>Arrow keys</td></tr>
+        </table>
+        <p class="note">Keyboard and mouse use the fixed layout shown here.</p>
+      </details>
+    </section>
+
+    <!-- EPISODES -->
+    <section class="page util" id="page-episodes">
+      <div class="util-head"><button class="back" data-back aria-label="Back">&larr;</button><h2>Episodes</h2></div>
+      <p class="note">Start the game at any episode. <b>Play</b> on the main page always starts the game normally.</p>
+      <label class="set switch"><div class="rl"><b>Skip menus and cutscenes</b><small>Open the game straight in the episode, with no boot movies and no menus. Turn it off to start a new game at the episode through the menus instead.</small></div><div class="rc"><input type="checkbox" id="direct"><span></span></div></label>
+      <div id="episodeList"></div>
+    </section>
+
+    <!-- SAVE STATES -->
+    <section class="page util" id="page-states">
+      <div class="util-head"><button class="back" data-back aria-label="Back">&larr;</button><h2>Save states</h2>
+        <div class="row push"><button class="btn" data-open="states">Open folder</button></div></div>
+      <p class="note">Press <kbd>F1</kbd> while playing to save a state. Choose one here to start the game from it.</p>
+      <div class="states" id="stateList"></div>
+    </section>
+
+    <!-- LOG -->
+    <section class="page util" id="page-logs">
+      <div class="util-head"><button class="back" data-back aria-label="Back">&larr;</button><h2>Log</h2><div class="row push"><button class="btn" id="copyLog">Copy</button><button class="btn" id="clearLog">Clear</button></div></div>
+      <pre id="log" class="log"></pre>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="page util" id="page-about">
+      <div class="util-head"><button class="back" data-back aria-label="Back">&larr;</button><h2>About</h2></div>
+      <div class="prose">
+        <p><b>Crash Launcher</b> <span class="muted" id="ver"></span></p>
+        <p>Prepares your own copy of <i>Crash of the Titans</i> (PAL or USA) and starts the native build. It contains no game code or assets. The game files are extracted from the disc image you provide, on your PC.</p>
+        <p class="muted">Built on <b>NWiiRecomp</b> by Volodymyr Vovchok (BlackLine Interactive), a Wii static recompiler and runtime released under a custom non-commercial licence. This launcher and the runtime are free, for personal and non-commercial use only. Selling them or including them in a commercial product is not permitted. See the NWiiRecomp licence for the full terms.</p>
+        <p class="muted">You must own the game. Crash of the Titans is a trademark of its respective owners. This project is not affiliated with or endorsed by them.</p>
+        <p class="muted" id="runtimePill"></p>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="mini" id="mini" hidden>
+  <button class="mini-art" id="miniOpen" title="Open soundtrack"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><i class="eq"><b></b><b></b><b></b></i></button>
+  <div class="mini-info"><b id="miniTitle"></b><span id="miniTime"></span><i class="mini-prog"><i id="miniProg"></i></i></div>
+  <div class="mini-ctl">
+    <button id="miniPrev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M7 5v14M18 5 9 12l9 7z"/></svg></button>
+    <button id="miniPlay" aria-label="Play or pause"><svg viewBox="0 0 24 24" id="miniIcon"><path d="M8 5v14l11-7z"/></svg></button>
+    <button id="miniNext" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M17 5v14M6 5l9 7-9 7z"/></svg></button>
+    <div class="vol"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg><input type="range" class="volr" min="0" max="100" aria-label="Volume"></div>
+    <button id="miniClose" aria-label="Stop"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>

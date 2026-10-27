@@ -1,0 +1,38 @@
+[package]
+name = "crash-launcher"
+version = "0.1.0"
+description = "Launcher for the Crash of the Titans native port"
+edition = "2021"
+build = "build.rs"
+
+[lib]
+name = "crash_launcher_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+zstd = { version = "0.13", features = ["zstdmt"] }
+sha2 = "0.10"
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+zstd = { version = "0.13", features = ["zstdmt"] }
+sha2 = "0.10"
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+gilrs = "0.11"
+nod = "2.0.0-alpha.9"
+# Title art composed from the player's disc (no game art ships with the launcher).
+png = "0.18"
+color_quant = "1.1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
