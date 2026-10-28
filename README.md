@@ -108,8 +108,7 @@ Checks: `python tools/builder_revision.py` verifies the pinned stage inputs; aft
 
 Built on [NWiiRecomp](https://github.com/BlackLineInteractive/NWiiRecomp) by Volodymyr Vovchok, with the audio backend
 adapted from [Dolphin](https://github.com/dolphin-emu/dolphin). Third-party licences are in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Much of this port was written with AI coding agents under human
-direction and is checked by differential tests and play.
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). And yeah no shit sherlock, this was written entirely by AI agents. I still had to sit through ts, guide them and do copious amounts of testing so if it's bad it's my fault. Should have remortgaged my house for more tokens
 
 Unofficial fan project for research and preservation, not affiliated with or endorsed by any rights holder. Crash
 Bandicoot, Crash of the Titans and related names and artwork belong to their owners. Free, non-commercial use only,
