@@ -403,6 +403,19 @@ async function loadLog() {
 $("clearLog").onclick = () => { logLines = []; logEl.textContent = ""; };
 $("copyLog").onclick = async () => { try { await navigator.clipboard.writeText(logEl.textContent); toast("Log copied."); } catch { toast("Could not copy.", true); } };
 
+// The internal image is 640x528 x scale, so the useful step is the one whose height still covers the window.
+function scaleHint() {
+  const w = Number($("ww").value) || 0, h = Number($("wh").value) || 0;
+  const el = $("scalehint");
+  if (!el) return;
+  if (!h) { el.textContent = ""; return; }
+  const need = Math.ceil(h / 528), pick = Math.min(4, Math.max(1, need));
+  const over = need > 4 ? " 4x is the maximum, so this window runs below native." : "";
+  el.textContent = `${w ? w + "×" + h : "This window"} → ${pick}x recommended.${over}`;
+}
+$("ww").addEventListener("input", scaleHint);
+$("wh").addEventListener("input", scaleHint);
+
 // ---------------------------------------------------------------- settings
 function fillSettings() {
   if (!state || fillSettings.dirty) return;
@@ -410,7 +423,7 @@ function fillSettings() {
   $("scale").querySelectorAll("button").forEach((b) => b.classList.toggle("on", Number(b.dataset.v) === s.resolution_scale));
   setSeg("aspect", s.widescreen ? "16:9" : "4:3"); setSeg("dmode", s.display_mode); setSeg("aniso", String(s.anisotropy));
   $("lang").value = s.language; $("prompts").value = s.button_prompts === "follow" ? "auto" : s.button_prompts || "auto"; $("speed").value = s.game_speed; $("speedV").textContent = Number(s.game_speed).toFixed(2).replace(/0$/, "") + "x";
-  $("ww").value = s.window_width; $("wh").value = s.window_height;
+  $("ww").value = s.window_width; $("wh").value = s.window_height; scaleHint();
   $("frameLimitMode").value = s.custom_fps == null ? "regional" : "custom";
   $("customFps").value = s.custom_fps ?? 120; updateFrameLimit();
   if (!$("framePacing").disabled) $("framePacing").checked = s.frame_pacing !== false;
@@ -500,6 +513,7 @@ for (const id of ["aspect", "dmode", "aniso"]) {
     if (id === "aspect") {   // keep the window shape in step with the chosen aspect ratio
       const w = Number($("ww").value) || 1280;
       $("wh").value = Math.round((w * (b.dataset.v === "16:9" ? 9 / 16 : 3 / 4)) / 10) * 10;
+      scaleHint();
     }
   });
 }
