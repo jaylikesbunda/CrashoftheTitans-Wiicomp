@@ -4,6 +4,17 @@ Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versi
 date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
 inputs is always rebuilt rather than reused.
 
+## [0.1.2] - 2026-10-28
+
+### Fixed
+
+- **A launcher build failed at the native-lowering stage.** That stage pins every lowered function to the decompilation
+  source it was written from, but the builder pack ships no decompilation tree (and must not ship one), so a build from
+  the installer stopped with `IDENTITY: source missing: ...` and *"the native lowering qualification is stale"* before
+  compiling anything. The source hashes are now skipped when that tree is absent; the `main.dol` pin and the
+  `builder-revision.json` hashes over the qualification data still apply.
+- Launcher `0.1.2`; builder revision `2026.10.28-2`.
+
 ## [0.1.1] - 2026-10-28
 
 ### Fixed

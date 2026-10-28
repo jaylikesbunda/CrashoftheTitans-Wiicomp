@@ -12,8 +12,8 @@
 > (`RQJE7D`). The launcher builds the game on your PC from your disc; no game code or data is distributed.
 
 The game's code is translated from PowerPC to C++ with [NWiiRecomp](https://github.com/BlackLineInteractive/NWiiRecomp)
-and compiled with a high-level Wii runtime into a native program. It is not an emulator. Pre-release: launcher `0.1.1`,
-builder `2026.10.28-1`. See [CHANGELOG.md](CHANGELOG.md).
+and compiled with a high-level Wii runtime into a native program. It is not an emulator. Pre-release: launcher `0.1.2`,
+builder `2026.10.28-2`. See [CHANGELOG.md](CHANGELOG.md).
 
 | Release | Disc ID | Status |
 | --- | --- | --- |
