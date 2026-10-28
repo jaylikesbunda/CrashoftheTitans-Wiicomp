@@ -4,6 +4,17 @@ Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versi
 date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
 inputs is always rebuilt rather than reused.
 
+## [0.1.3] - 2026-10-28
+
+### Changed
+
+- **The internal-resolution buttons show the real buffer size**: `1x · 640×528`, `2x · 1280×1056`, `3x · 1920×1584`,
+  `4x · 2560×2112`. The old `≈1080p / ≈1440p / ≈4K` labels counted lines and overstated the width — 2x read as 1080p while
+  rendering 1280×1056, which is 65% of 1080p's pixels.
+- The row now derives a recommendation from the window height (2x for 720p, 3x for 1080p, 4x for 1440p) and says so when a
+  window is taller than 4x can cover, since 4x tops out at 2112 lines.
+- Launcher `0.1.3`; builder unchanged at `2026.10.28-2`.
+
 ## [0.1.2] - 2026-10-28
 
 ### Fixed
