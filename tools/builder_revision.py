@@ -1,7 +1,7 @@
 """Shared identity for the patches required by the launcher build from disc."""
 from pathlib import Path
 import hashlib,json
-REVISION='2026.10.28-1'
+REVISION='2026.10.28-2'
 REQUIRED=(
  'tools/fix_guest_batch.py','tools/guest_batch_lowering.py','tools/guest_typed_leaves.py','tools/check_guest_batch.py','runtime-overlays/native_guest_batch.h',
  # NATIVE_MEM_PROOF_V1: region-hoisted address proofs over the promoted hot units.

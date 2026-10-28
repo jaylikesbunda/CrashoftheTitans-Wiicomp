@@ -285,6 +285,9 @@ def includes_for(candidates_):
 # Identity pinning
 # ---------------------------------------------------------------------------
 REPO = PORT.parent
+# The decompilation tree exists only in a developer checkout. A launcher build ships the qualification data instead, pinned
+# by builder-revision.json, so there is no local source to compare against.
+SRC = REPO / 'src'
 
 
 def check_identity(manifest, adopted):
@@ -306,6 +309,11 @@ def check_identity(manifest, adopted):
             expected = recorded.read_text().split()[0]
             if expected.lower() != dol.lower():
                 problems.append('manifest DOL hash %s does not match the recorded %s' % (dol, expected))
+    if not SRC.is_dir():
+        # A user build has no decompilation sources. The DOL is still pinned, and every qualification file is hashed into
+        # builder-revision.json, so the shipped lowering cannot drift without the launcher refusing the pack.
+        print('IDENTITY: decompilation sources absent (%s); source hashes not checked' % SRC)
+        return problems
     for entry in adopted:
         source = entry.get('source')
         expected = entry.get('source_sha256')

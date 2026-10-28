@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "2026.10.28-1",
+  "revision": "2026.10.28-2",
   "required_inputs": {
     "tools/fix_guest_batch.py": "619822f9aa655f930ec02fbf8fb488fbeac86c9a8c5807d9dea113fa7d2ba81d",
     "tools/guest_batch_lowering.py": "2438f7dee71d780e8351b3ed3e7c7768da1e069fbde0142f8afe4a3dc92f38b5",
@@ -65,7 +65,7 @@
     "runtime-overlays/input_mapping.h": "100de4b568e4c58b27dc48fbb2efa9bdf0ee96f2032bc61eb3f3b3396a7382cb",
     "tools/build_native.py": "9de57dc1376c58c524de68035f1a91ee157ae6171ea78cedaf077698d0d45a1f",
     "tools/clean_room_build.py": "98ddf37f17b29b790f4ad59e1eda31f01f25d9c3b27e8aa2d80a6ed39a035ebc",
-    "tools/builder_revision.py": "a225f3de8d6e498a6a6f8198f1bfc352849151b7c3f7d4bd126d45bfe480aaff",
+    "tools/builder_revision.py": "79be3fc5f7ef92fe1ce553dc7d623489a57c5337700e6c17777b8e8e6f7743a9",
     "tools/build_resources.py": "01762902aff5b83117b5c2d846e0e95827e46e351c82520e19ee0f88e7b2e4ab",
     "tools/fix_parse_work_reuse.py": "17b8f05af543373bd19df880372dae7f00c1f836a3c2081879c3c2219f65fe90",
     "tools/fix_decode_work_reuse.py": "1f71a54a61a89701b9a6e0f9590d9c209c22134dbdb8d7d38813bdc6bb06bcd1",
@@ -254,7 +254,7 @@
     "runtime-overlays/static_ram_base.cpp": "1837ff52225313ea91ffdb4db8df1b3a6b9dd1fafd97010c8a8ec8124e40d178",
     "tools/bench_guest_ram_fast.py": "062bd247f848f93b382b6cd2df5b1b1f22c63624aa9ea41fb3359fa3bc872d9f",
     "tools/run_guest_pass_checks.py": "99ce70c6625939bb5b08e2abbfb2d55148f4774de1ac150063c22c1f0a8397cc",
-    "tools/native_lowering.py": "cb605eb09c3f596d9343d22b45c147173f970749ebd51204f1d29f682f7764d9",
+    "tools/native_lowering.py": "4b7bf5a3ebf92894bdbd150bcd45e698039451b0d9dbceeb77107754a3b56aa8",
     "tools/fix_native_lowering.py": "e726893f69892a19cd548b989d96235efca45f93d8eadb89ba3e8a1505101e7e",
     "tools/fix_native_lowering_includes.py": "f3e69737e829040b6835f463a9aef137abd215539a09c3c8fd93cc2d6fe8fc7b",
     "tools/check_native_lowering.py": "0fbcec6f83d36876c19ca1138a47a10f708c1c2d9c657a3a8a40e723acd02719",
