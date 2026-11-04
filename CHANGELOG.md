@@ -4,6 +4,10 @@ Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versi
 date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
 inputs is always rebuilt rather than reused.
 
+## [0.1.4] - 2026-11-04
+
+- Fixed two US disc (`RQJE7D`) build failures by skipping a PAL-only optimization and remapping qualified blocks to US addresses (builder `2026.11.04-1`).
+
 ## [0.1.3] - 2026-10-28
 
 ### Changed

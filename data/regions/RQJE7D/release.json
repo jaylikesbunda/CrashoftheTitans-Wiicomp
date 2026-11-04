@@ -3,6 +3,10 @@
   "name": "Crash of the Titans (USA)",
   "region": "NTSC-U",
   "dol_sha256": "7e562fcce7113b7fe55dff35c1872d8289ce7db3cf4e117067001e6e06875e8d",
+  "reference_only_stages": {
+    "fix_native_lowering.py": "source-backed native lowerings are qualified only for the PAL main.dol",
+    "fix_native_lowering_includes.py": "the PAL-only native lowering stage is skipped"
+  },
   "hle": {
     "ext_interrupt_dispatch": "0x803B7EE4",
     "sched_lock_offset": "0x2A28"

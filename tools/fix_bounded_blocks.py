@@ -7,7 +7,21 @@ p=bc.PORT;report=bc.load_report('bounded-block-qualification.json')
 scan=bc.load_report('bounded-block-candidates.json')
 assert report['regions']==scan['count'],'Complete the full-image qualification before adoption'
 selected=[r for r in report['results'] if r['adopted'] and not r['failed'] and not r['fp'] and all(bank=='gpr' for bank,n in r['used'])]
-selected=[r for r in selected if region.active().reference or region.active().exact(int(r['function'],16))] # another release keeps only functions proven identical
+release=region.active()
+if not release.reference:
+ # The compressed reports are PAL evidence and are not rewritten by rebase_tree.
+ # Resolve the reference function first: the same numeric address can name a
+ # different, also qualified function in the target release.
+ mapped=[]
+ for r in selected:
+  ref_function=int(r['function'],16)
+  ref_address=int(r['address'],16)
+  function=release.address(ref_function)
+  address=release.address(ref_address)
+  if (function is not None and address is not None and release.exact(function)
+      and 0<=ref_address-ref_function==address-function):
+   mapped.append(dict(r,function=f'{function:08X}',address=f'{address:08X}'))
+ selected=mapped
 byfile={}
 for r in selected:
  r['file']=region.chunk_file(r['function'],r['file']) # another release splits its functions into different chunks
