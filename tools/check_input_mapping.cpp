@@ -17,7 +17,7 @@ int main() {
   {
     MapConfig m = default_map(2); MapperState s;
     struct { PadInput p; uint32_t want; } cases[] = {
-      {P_SOUTH, 0x0800}, {P_EAST, 0x0400}, {P_RTRIGGER, 0x0400}, {P_WEST, 0x0200}, {P_NORTH, 0x0100}, {P_START, 0x0010}, {P_BACK, 0x1000},
+      {P_SOUTH, 0x0800}, {P_EAST, 0x0400}, {P_RTRIGGER, 0}, {P_WEST, 0x0200}, {P_NORTH, 0x0100}, {P_START, 0x0010}, {P_BACK, 0x1000},
       {P_GUIDE, 0x8000}, {P_DUP, 0x0008}, {P_DDOWN, 0x0004}, {P_DLEFT, 0x0001}, {P_DRIGHT, 0x0002}, {P_LSHOULDER, 0x4000},
       {P_RSHOULDER, 0x2000}, {P_LTRIGGER, 0x2000}};
     for (auto& c : cases) CHECK(one(with(c.p), m, s).buttons == c.want);
@@ -144,6 +144,31 @@ int main() {
     CHECK(one(both, m, s).stick_x > 100);   // a moved stick wins over keys
     RawPad shake; shake.keys[W_SHAKE_REMOTE] = true;
     CHECK(std::fabs(one(shake, m, s).remote_accel.x) > 1.f);
+  }
+  // titan special: R2 / E shake both devices, strongly enough for the game's threshold break (more than 3.0 g, Ratcicle)
+  // while each axis stays inside what the WPAD packet can carry (511 counts at 204 per g)
+  {
+    MapConfig m = default_map(2);
+    CHECK(m.bind[W_TITAN_SPECIAL] == bit(P_RTRIGGER) && m.keys[W_TITAN_SPECIAL].size() == 1 && m.keys[W_TITAN_SPECIAL][0] == "E");
+    WiiInput w; CHECK(wii_by_name("Titan_Special", w) && w == W_TITAN_SPECIAL);
+    for (int via_key = 0; via_key < 2; ++via_key) {
+      MapperState s; RawPad r = via_key ? RawPad() : with(P_RTRIGGER); if (via_key) r.keys[W_TITAN_SPECIAL] = true;
+      float min_r = 99, min_n = 99, max_axis = 0; bool ended = false; MapperOutput o;
+      for (int i = 0; i < 40; ++i) {
+        o = one(r, m, s, 0.016f);
+        CHECK(o.buttons == 0);
+        const auto len = [](const Vec3& v) { return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z); };
+        if (i * 0.016f < 0.3f) {
+          min_r = std::min(min_r, len(o.remote_accel)); min_n = std::min(min_n, len(o.nunchuk_accel));
+          for (const Vec3& v : {o.remote_accel, o.nunchuk_accel}) max_axis = std::max({max_axis, std::fabs(v.x), std::fabs(v.y), std::fabs(v.z)});
+        }
+        if (i * 0.016f > 0.5f && near(o.remote_accel.z, 1.0f) && near(o.nunchuk_accel.z, 1.0f)) ended = true;
+      }
+      CHECK(min_r > 3.2f && min_n > 3.2f); CHECK(max_axis <= 511.f / 204.f); CHECK(ended);
+    }
+    apply_line(m, "titan_special=LeftStick");
+    MapperState s; CHECK(std::fabs(one(with(P_LSTICK), m, s).remote_accel.x) > 2.f);
+    MapperState s2; CHECK(near(one(with(P_RTRIGGER), m, s2).remote_accel.x, 0));
   }
   std::printf("%d checks, %d failed\n", checks, failures);
   return failures ? 1 : 0;

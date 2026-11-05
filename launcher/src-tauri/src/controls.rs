@@ -32,19 +32,21 @@ pub const PAD_INPUTS: &[(&str, &str)] = &[
 ];
 
 /// Shake inputs are not Wii buttons; they start a motion burst on the chosen device.
-pub const SHAKE_INPUTS: &[(&str, &str)] = &[("shake_remote", "Shake Wii Remote"), ("shake_nunchuk", "Shake Nunchuk"), ("recenter", "Recentre pointer")];
+/// `titan_special` shakes both devices at once, which is every titan's special attack.
+pub const SHAKE_INPUTS: &[(&str, &str)] = &[("shake_remote", "Shake Wii Remote"), ("shake_nunchuk", "Shake Nunchuk"),
+    ("titan_special", "Titan special (shake both)"), ("recenter", "Recentre pointer")];
 
 /// The Nunchuk stick from keys (player 1's keyboard; a controller's stick drives it directly).
 pub const KEY_STICK_INPUTS: &[(&str, &str)] = &[("stick_up", "Stick up"), ("stick_down", "Stick down"), ("stick_left", "Stick left"), ("stick_right", "Stick right")];
 
 /// The runtime's built-in bindings (input_mapping.h `default_map`), used for a Wii input with no explicit binding.
 pub const DEFAULT_BINDINGS: &[(&str, &str)] = &[
-    ("a", "South,Key:Space,Mouse:Left"), ("b", "East,RightTrigger,Mouse:Right"), ("one", "West,Key:1"), ("two", "North,Key:2"),
+    ("a", "South,Key:Space,Mouse:Left"), ("b", "East,Mouse:Right"), ("one", "West,Key:1"), ("two", "North,Key:2"),
     ("plus", "Start,Key:Return"), ("minus", "Back,Key:Backspace"), ("home", "Guide"),
     ("up", "DpadUp,Key:Up"), ("down", "DpadDown,Key:Down"), ("left", "DpadLeft,Key:Left"), ("right", "DpadRight,Key:Right"),
     ("c", "LeftShoulder,Key:Q"), ("z", "RightShoulder,LeftTrigger,Key:Left Shift"),
     ("stick_up", "Key:W"), ("stick_down", "Key:S"), ("stick_left", "Key:A"), ("stick_right", "Key:D"),
-    ("shake_remote", "Key:F"), ("shake_nunchuk", "Key:R"), ("recenter", "Mouse:Middle"),
+    ("shake_remote", "Key:F"), ("shake_nunchuk", "Key:R"), ("titan_special", "RightTrigger,Key:E"), ("recenter", "Mouse:Middle"),
 ];
 
 /// Mouse buttons the runtime reads, as written after `Mouse:`.
@@ -313,6 +315,23 @@ mod tests {
                 assert_eq!(c.clone().sanitized().bindings.get(*wii).map(String::as_str), Some(*pad), "{wii} <- {pad}");
             }
         }
+    }
+
+    #[test]
+    fn default_controller_buttons_each_do_one_thing() {
+        // A controller input in two defaults would do two things at once (R2 used to repeat B).
+        let mut seen: Vec<&str> = Vec::new();
+        for (wii, value) in DEFAULT_BINDINGS {
+            for part in value.split(',').filter(|p| canonical_pad(p).is_some()) {
+                assert!(!seen.contains(&part), "{part} is bound to more than one input by default (again at {wii})");
+                seen.push(part);
+            }
+        }
+        assert_eq!(Controls::default().effective("titan_special"), vec!["RightTrigger".to_string(), "Key:E".to_string()]);
+        assert_eq!(Controls::default().effective("b"), vec!["East".to_string(), "Mouse:Right".to_string()]);
+        let mut c = Controls::default();
+        c.bindings.insert("titan_special".into(), "LeftStick".into());
+        assert!(lines(&c.to_map_file()).contains(&"titan_special=LeftStick".to_string()));
     }
 
     #[test]

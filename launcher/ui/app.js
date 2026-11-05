@@ -569,14 +569,14 @@ const capHtml = (name, fam) => {
 const WII_REMOTE = [["a", "A"], ["b", "B"], ["one", "1"], ["two", "2"], ["minus", "− Minus"], ["home", "Home"], ["plus", "+ Plus"],
   ["up", "D-pad up"], ["down", "D-pad down"], ["left", "D-pad left"], ["right", "D-pad right"]];
 const WII_NUNCHUK = [["c", "C"], ["z", "Z"], ["shake_nunchuk", "Shake Nunchuk"]];
-const WII_MOTION = [["shake_remote", "Shake Remote"], ["recenter", "Recentre pointer"]];
+const WII_MOTION = [["shake_remote", "Shake Remote"], ["titan_special", "Titan special (shake both)"], ["recenter", "Recentre pointer"]];
 // The runtime's built-in layout (input_mapping.h default_map), used when a Wii input has no explicit binding.
-const DEFAULT_BIND = { a: ["South", "Key:Space", "Mouse:Left"], b: ["East", "RightTrigger", "Mouse:Right"], one: ["West", "Key:1"],
+const DEFAULT_BIND = { a: ["South", "Key:Space", "Mouse:Left"], b: ["East", "Mouse:Right"], one: ["West", "Key:1"],
   two: ["North", "Key:2"], plus: ["Start", "Key:Return"], minus: ["Back", "Key:Backspace"], home: ["Guide"],
   up: ["DpadUp", "Key:Up"], down: ["DpadDown", "Key:Down"], left: ["DpadLeft", "Key:Left"], right: ["DpadRight", "Key:Right"],
   c: ["LeftShoulder", "Key:Q"], z: ["RightShoulder", "LeftTrigger", "Key:Left Shift"],
   stick_up: ["Key:W"], stick_down: ["Key:S"], stick_left: ["Key:A"], stick_right: ["Key:D"],
-  shake_remote: ["Key:F"], shake_nunchuk: ["Key:R"], recenter: ["Mouse:Middle"] };
+  shake_remote: ["Key:F"], shake_nunchuk: ["Key:R"], titan_special: ["RightTrigger", "Key:E"], recenter: ["Mouse:Middle"] };
 // Keyboard and mouse bindings (player 1 only) share each input's list with the controller ones: "Key:<SDL key name>", "Mouse:<button>".
 const KB_STICK = [["stick_up", "Stick up"], ["stick_down", "Stick down"], ["stick_left", "Stick left"], ["stick_right", "Stick right"]];
 const isKb = (t) => t.startsWith("Key:") || t.startsWith("Mouse:");

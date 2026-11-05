@@ -30,7 +30,9 @@ enum PadInput : int {
 };
 enum WiiInput : int {
   W_A, W_B, W_1, W_2, W_PLUS, W_MINUS, W_HOME, W_UP, W_DOWN, W_LEFT, W_RIGHT, W_C, W_Z,
-  W_SHAKE_REMOTE, W_SHAKE_NUNCHUK, W_RECENTER, W_STICK_UP, W_STICK_DOWN, W_STICK_LEFT, W_STICK_RIGHT, W_COUNT
+  W_SHAKE_REMOTE, W_SHAKE_NUNCHUK, W_RECENTER, W_STICK_UP, W_STICK_DOWN, W_STICK_LEFT, W_STICK_RIGHT,
+  W_TITAN_SPECIAL,                                // shakes the Remote and the Nunchuk together: every titan's special attack
+  W_COUNT
 };
 enum MouseButton : uint8_t { M_LEFT = 1, M_MIDDLE = 2, M_RIGHT = 4, M_X1 = 8, M_X2 = 16 };
 
@@ -45,7 +47,7 @@ struct RawPad {
 
 // Retail WPAD button bits.
 static const uint32_t kWiiMask[W_COUNT] = {
-  0x0800, 0x0400, 0x0200, 0x0100, 0x0010, 0x1000, 0x8000, 0x0008, 0x0004, 0x0001, 0x0002, 0x4000, 0x2000, 0, 0, 0, 0, 0, 0, 0
+  0x0800, 0x0400, 0x0200, 0x0100, 0x0010, 0x1000, 0x8000, 0x0008, 0x0004, 0x0001, 0x0002, 0x4000, 0x2000, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 enum class Pointer { Stick, Gyro, Both, None };
@@ -68,11 +70,13 @@ struct MapConfig {
 
 inline uint32_t bit(PadInput p) { return 1u << p; }
 
-// Previous fixed mapping: A/B/1/2/+/-/Home/D-pad on the face and system buttons, C = L1, Z = R1 or L2, B also on R2.
+// Fixed mapping: A/B/1/2/+/-/Home/D-pad on the face and system buttons, C = L1, Z = R1 or L2. R2 is the titan special
+// (it used to repeat B), so a controller without motion can use every titan's shake attack.
 inline MapConfig default_map(int legacy_mode) {
   MapConfig m;
   m.bind[W_A] = bit(P_SOUTH);
-  m.bind[W_B] = bit(P_EAST) | bit(P_RTRIGGER);
+  m.bind[W_B] = bit(P_EAST);
+  m.bind[W_TITAN_SPECIAL] = bit(P_RTRIGGER);
   m.bind[W_1] = bit(P_WEST);
   m.bind[W_2] = bit(P_NORTH);
   m.bind[W_PLUS] = bit(P_START);
@@ -91,7 +95,7 @@ inline MapConfig default_map(int legacy_mode) {
   m.keys[W_UP] = {"Up"}; m.keys[W_DOWN] = {"Down"}; m.keys[W_LEFT] = {"Left"}; m.keys[W_RIGHT] = {"Right"};
   m.keys[W_C] = {"Q"}; m.keys[W_Z] = {"Left Shift"};
   m.keys[W_STICK_UP] = {"W"}; m.keys[W_STICK_DOWN] = {"S"}; m.keys[W_STICK_LEFT] = {"A"}; m.keys[W_STICK_RIGHT] = {"D"};
-  m.keys[W_SHAKE_REMOTE] = {"F"}; m.keys[W_SHAKE_NUNCHUK] = {"R"}; m.mouse[W_RECENTER] = M_MIDDLE;
+  m.keys[W_SHAKE_REMOTE] = {"F"}; m.keys[W_SHAKE_NUNCHUK] = {"R"}; m.keys[W_TITAN_SPECIAL] = {"E"}; m.mouse[W_RECENTER] = M_MIDDLE;
   return m;
 }
 
@@ -129,6 +133,7 @@ inline bool wii_by_name(const std::string& name, WiiInput& out) {
     {"up", W_UP}, {"down", W_DOWN}, {"left", W_LEFT}, {"right", W_RIGHT}, {"c", W_C}, {"z", W_Z},
     {"shake_remote", W_SHAKE_REMOTE}, {"shake_nunchuk", W_SHAKE_NUNCHUK}, {"recenter", W_RECENTER},
     {"stick_up", W_STICK_UP}, {"stick_down", W_STICK_DOWN}, {"stick_left", W_STICK_LEFT}, {"stick_right", W_STICK_RIGHT},
+    {"titan_special", W_TITAN_SPECIAL},
   };
   const std::string n = lower(name);
   for (auto& e : t) if (n == e.n) { out = e.w; return true; }
@@ -213,7 +218,7 @@ struct MapperState {
   bool primed = false;
   Vec3 gravity{0, 0, 1};                 // smoothed accelerometer reading (g), points up in the controller frame
   float shake_remote_t = -1, shake_nunchuk_t = -1;   // seconds since the burst began, <0 when idle
-  bool prev_shake_remote = false, prev_shake_nunchuk = false, prev_recenter = false;
+  bool prev_shake_remote = false, prev_shake_nunchuk = false, prev_recenter = false, prev_titan_special = false;
 };
 
 struct MapperOutput {
@@ -278,15 +283,19 @@ inline MapperOutput map_pad(const RawPad& r, const MapConfig& m, MapperState& s,
   o.recenter = recenter && !s.prev_recenter;
   s.prev_recenter = recenter;
 
-  // Shake gestures: a short alternating burst, started by a button edge.
-  const bool shake_r = held(W_SHAKE_REMOTE), shake_n = held(W_SHAKE_NUNCHUK);
-  if (shake_r && !s.prev_shake_remote) s.shake_remote_t = 0;
-  if (shake_n && !s.prev_shake_nunchuk) s.shake_nunchuk_t = 0;
-  s.prev_shake_remote = shake_r; s.prev_shake_nunchuk = shake_n;
+  // Shake gestures: a short alternating burst, started by a button edge. The titan special starts both at once: each titan's
+  // special listens to one device (Battler either, Ratcicle the Remote, Shurtle/Sludge/Spike the Nunchuk).
+  const bool shake_r = held(W_SHAKE_REMOTE), shake_n = held(W_SHAKE_NUNCHUK), titan = held(W_TITAN_SPECIAL);
+  if ((shake_r && !s.prev_shake_remote) || (titan && !s.prev_titan_special)) s.shake_remote_t = 0;
+  if ((shake_n && !s.prev_shake_nunchuk) || (titan && !s.prev_titan_special)) s.shake_nunchuk_t = 0;
+  s.prev_shake_remote = shake_r; s.prev_shake_nunchuk = shake_n; s.prev_titan_special = titan;
+  // The game's "threshold break" compares the vector length in g with a per-titan limit (Ratcicle: more than 3.0 g on the
+  // Remote). The WPAD packet holds at most about 2.5 g per axis, so the burst spreads over all three axes: about 3.6 g in both
+  // halves, which also stays a clear shake for the ordinary shake events.
   auto burst = [&](float& t, Vec3& a) {
     if (t < 0) return;
     const float sign = ((int)(t / kShakeHalfPeriod) & 1) ? -1.f : 1.f;
-    a.x += sign * 2.5f; a.y += sign * 1.2f;
+    a.x = sign * 2.4f; a.y = sign * 1.6f; a.z = 2.2f;
     t += dt; if (t >= kShakeSeconds) t = -1;
   };
 

@@ -4,6 +4,13 @@ Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versi
 date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
 inputs is always rebuilt rather than reused.
 
+## [0.1.7] - 2026-11-06
+
+- Fixed Aku Aku blocking on foot: the fallback interpreter now runs the condition-register logic instructions (cror and friends) instead of skipping them.
+- Added a Titan special input that shakes the Remote and Nunchuk together, bound to RT / R2 (E on keyboard) for controllers without motion.
+- Strengthened shake bursts so motion-threshold attacks such as Ratcicle's special can trigger.
+- Removed the default RT duplicate of B; B/Circle stays the attack button.
+
 ## [0.1.6] - 2026-11-05
 
 - Fixed the NTSC crash caused by concurrent guest-memory tracking faults.

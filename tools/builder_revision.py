@@ -1,7 +1,7 @@
 """Shared identity for the patches required by the launcher build from disc."""
 from pathlib import Path
 import hashlib,json
-REVISION='2026.11.05-2'
+REVISION='2026.11.06-1'
 REQUIRED=(
  'tools/fix_guest_batch.py','tools/guest_batch_lowering.py','tools/guest_typed_leaves.py','tools/check_guest_batch.py','runtime-overlays/native_guest_batch.h',
  # NATIVE_MEM_PROOF_V1: region-hoisted address proofs over the promoted hot units.
@@ -28,6 +28,7 @@ REQUIRED=(
  'tools/check_input_devices.py','tools/input_devices_tests.cpp',
  'tools/fix_input_mapping.py','runtime-overlays/input_mapping.h',
  'tools/build_native.py','tools/clean_room_build.py','tools/builder_revision.py',
+ 'tools/fix_interpreter_crlogic.py',
  'tools/build_resources.py',
  'tools/fix_parse_work_reuse.py','tools/fix_decode_work_reuse.py','tools/fix_draw_submission_reuse.py',
  'tools/fix_texture_binding_shadow.py','runtime-overlays/native_gl_texture_shadow.h',

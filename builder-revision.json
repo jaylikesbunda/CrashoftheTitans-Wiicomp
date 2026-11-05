@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "2026.11.05-2",
+  "revision": "2026.11.06-1",
   "required_inputs": {
     "tools/fix_guest_batch.py": "619822f9aa655f930ec02fbf8fb488fbeac86c9a8c5807d9dea113fa7d2ba81d",
     "tools/guest_batch_lowering.py": "2438f7dee71d780e8351b3ed3e7c7768da1e069fbde0142f8afe4a3dc92f38b5",
@@ -63,10 +63,11 @@
     "tools/check_input_devices.py": "9de22b87f9a3ccddd6e21c705c89ff5687039c41c71cb4d527f1102613b1fcc7",
     "tools/input_devices_tests.cpp": "9453e5a50e76e71cef7eb985c988392c4978449ef16916f0ba30eaeebee2b312",
     "tools/fix_input_mapping.py": "c2d81092b895a48719ef0839382b2b3deda8a667178c1ea205102de3a3e0affc",
-    "runtime-overlays/input_mapping.h": "100de4b568e4c58b27dc48fbb2efa9bdf0ee96f2032bc61eb3f3b3396a7382cb",
-    "tools/build_native.py": "475cfbaabd8accbf211f18dd86fec1319ea457ad4bad541ea0124a0fb780cc1e",
+    "runtime-overlays/input_mapping.h": "5f6027da05c1a304c24e0b12f39603ec1a0a69379a03ae25a9ce06228ece7a95",
+    "tools/build_native.py": "2a2f9d3191c893f6db42f4b96109542dc80d65d2ddfb8c6f648ba32b95690277",
     "tools/clean_room_build.py": "98ddf37f17b29b790f4ad59e1eda31f01f25d9c3b27e8aa2d80a6ed39a035ebc",
-    "tools/builder_revision.py": "7552e1ef30f57414d769c6a29465cf6dbd11b1a83598351f24229515f7b6bfea",
+    "tools/builder_revision.py": "9088f0711e77381b2de6d67271a432bbce1f250b6c12ace857066164fce0dc56",
+    "tools/fix_interpreter_crlogic.py": "dfeb69b3d1cc2846a400f1a367d1c1d117ba7aafa8c6fa915418a314d355d88b",
     "tools/build_resources.py": "01762902aff5b83117b5c2d846e0e95827e46e351c82520e19ee0f88e7b2e4ab",
     "tools/fix_parse_work_reuse.py": "17b8f05af543373bd19df880372dae7f00c1f836a3c2081879c3c2219f65fe90",
     "tools/fix_decode_work_reuse.py": "1f71a54a61a89701b9a6e0f9590d9c209c22134dbdb8d7d38813bdc6bb06bcd1",
