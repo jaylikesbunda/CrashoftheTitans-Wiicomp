@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "2026.11.04-1",
+  "revision": "2026.11.05-1",
   "required_inputs": {
     "tools/fix_guest_batch.py": "619822f9aa655f930ec02fbf8fb488fbeac86c9a8c5807d9dea113fa7d2ba81d",
     "tools/guest_batch_lowering.py": "2438f7dee71d780e8351b3ed3e7c7768da1e069fbde0142f8afe4a3dc92f38b5",
@@ -63,9 +63,9 @@
     "tools/input_devices_tests.cpp": "9453e5a50e76e71cef7eb985c988392c4978449ef16916f0ba30eaeebee2b312",
     "tools/fix_input_mapping.py": "c2d81092b895a48719ef0839382b2b3deda8a667178c1ea205102de3a3e0affc",
     "runtime-overlays/input_mapping.h": "100de4b568e4c58b27dc48fbb2efa9bdf0ee96f2032bc61eb3f3b3396a7382cb",
-    "tools/build_native.py": "9de57dc1376c58c524de68035f1a91ee157ae6171ea78cedaf077698d0d45a1f",
+    "tools/build_native.py": "475cfbaabd8accbf211f18dd86fec1319ea457ad4bad541ea0124a0fb780cc1e",
     "tools/clean_room_build.py": "98ddf37f17b29b790f4ad59e1eda31f01f25d9c3b27e8aa2d80a6ed39a035ebc",
-    "tools/builder_revision.py": "4a79faa92b9841cb37de15b259b6096eb5414396e2293fce28953735d037acd9",
+    "tools/builder_revision.py": "95bf7d97108e4803e7f06cfb319877fc3023fedd6d117be6e81cdad0a73e6700",
     "tools/build_resources.py": "01762902aff5b83117b5c2d846e0e95827e46e351c82520e19ee0f88e7b2e4ab",
     "tools/fix_parse_work_reuse.py": "17b8f05af543373bd19df880372dae7f00c1f836a3c2081879c3c2219f65fe90",
     "tools/fix_decode_work_reuse.py": "1f71a54a61a89701b9a6e0f9590d9c209c22134dbdb8d7d38813bdc6bb06bcd1",

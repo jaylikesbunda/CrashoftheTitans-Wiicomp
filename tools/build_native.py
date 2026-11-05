@@ -189,6 +189,10 @@ if not args.generate_only:
     run('native-controller-stage',[sys.executable,PORT/'tools/fix_ps5_controller.py'])
     run('native-alpha-lighting-stage',[sys.executable,PORT/'tools/fix_alpha_lighting.py'])
 configure=['cmake','-S',src,'-B',build,'-G','Ninja','-DCMAKE_BUILD_TYPE=RelWithDebInfo','-DCMAKE_EXE_LINKER_FLAGS=-static','-DSDL_SHARED=OFF','-DSDL_STATIC=ON','-DCMAKE_POLICY_VERSION_MINIMUM=3.5']
+# glad uses CMake's Python discovery, which can otherwise select an unrelated
+# system interpreter even when the launcher has set PYTHONHOME for its own pack.
+configure.extend([f'-DPython_EXECUTABLE={Path(sys.executable).resolve().as_posix()}',
+                  f'-DPYTHON_EXECUTABLE={Path(sys.executable).resolve().as_posix()}'])
 for dep in ('sdl2','tomlplusplus','glad'):
     cached=storage/'nwii-full/_deps'/f'{dep}-src'
     if cached.exists():configure.append(f'-DFETCHCONTENT_SOURCE_DIR_{dep.upper()}={cached.as_posix()}')

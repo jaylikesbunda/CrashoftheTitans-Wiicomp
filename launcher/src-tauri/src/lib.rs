@@ -951,7 +951,11 @@ async fn build_runtime(app: AppHandle, state: State<'_, AppState>) -> Result<(),
         };
         let mut cmd = Command::new(&python);
         if let Some(path) = path_env { cmd.env("PATH", path); }
-        if let Some(p) = &pack { cmd.arg("-X").arg("utf8"); cmd.env("PYTHONHOME", p.join("toolchain/python")); }
+        if let Some(p) = &pack {
+            cmd.arg("-X").arg("utf8");
+            cmd.env("PYTHONHOME", p.join("toolchain/python"));
+            cmd.env_remove("PYTHONPATH");
+        }
         cmd.arg(&script).arg("--dest").arg(&dest).arg("--dol").arg(&dol).arg("--index").arg(&index)
             .arg("--resume")
             .arg("--expected-builder-revision").arg(builder_identity::revision())
