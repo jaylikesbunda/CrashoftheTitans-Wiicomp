@@ -1,7 +1,7 @@
 """Shared identity for the patches required by the launcher build from disc."""
 from pathlib import Path
 import hashlib,json
-REVISION='2026.11.05-1'
+REVISION='2026.11.05-2'
 REQUIRED=(
  'tools/fix_guest_batch.py','tools/guest_batch_lowering.py','tools/guest_typed_leaves.py','tools/check_guest_batch.py','runtime-overlays/native_guest_batch.h',
  # NATIVE_MEM_PROOF_V1: region-hoisted address proofs over the promoted hot units.
@@ -13,6 +13,7 @@ REQUIRED=(
  # NATIVE_CAMERA_GLIDE_V1: build-time camera glide stage; runtime inert unless NWII_CAMERA_GLIDE_MS is set.
  'tools/fix_camera_glide.py','tools/check_camera_glide.py','runtime-overlays/native_camera_glide.h',
  'tools/fix_draw_followups.py','tools/check_draw_followups.py','runtime-overlays/native_viewport_shadow.h','runtime-overlays/native_uniform_epoch.h',
+ 'runtime-overlays/viewport.inc',
  'tools/fix_audit_speedups.py','tools/check_audit_speedups.py','tools/check_packed_upload.py','tools/check_packed_layout.py','tools/check_retained_gpu.py','runtime-overlays/native_tlut_epoch.h',
  'tools/fix_heavy_scene.py','tools/check_heavy_scene.py','runtime-overlays/native_palette_decode.h','runtime-overlays/native_batch_boundaries.h',
  'tools/check_v13_codegen.py',

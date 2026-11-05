@@ -141,7 +141,8 @@ uintptr_t page_view(unsigned view, uint32_t phys) {
 void protect_page(uint32_t phys, DWORD protection) {
   for (unsigned v = 0; v < kViews; ++v) {
     DWORD old;
-    VirtualProtect(reinterpret_cast<void*>(page_view(v, phys)), 4096, protection, &old);
+    if (!VirtualProtect(reinterpret_cast<void*>(page_view(v, phys)), 4096, protection, &old))
+      die("cannot change tracked RAM protection", GetLastError());
   }
 }
 
@@ -323,6 +324,7 @@ struct Tracker {
   std::atomic<uint8_t> dirty[kPages1 + kPages2];
   uint64_t generation[kPages1 + kPages2];
   uint8_t faults[kPages1 + kPages2];
+  std::atomic<uint32_t> writers[kPages1 + kPages2]{}; // scopes change under g_track_mutex; epoch readers stay lock-free
   // NATIVE_TEXTURE_VALIDATION_MEMO_V1 (per-page epochs): the epoch of the last write that reached each page. Values come from
   // g_write_epoch, so a page's epoch only grows and a fresh value exceeds every value handed out before.
   std::atomic<uint64_t> page_epoch[kPages1 + kPages2];
@@ -344,11 +346,17 @@ void tracker_unprotect(uint32_t phys) { protect_page(phys & ~0xfffu, PAGE_READWR
 
 bool tracker_fault(uint32_t phys) {
   if (!g_tracker) return false;
+  std::lock_guard<std::mutex> lock(g_track_mutex);
+  uint8_t sticky_kind;
+  if (sticky_page(phys, &sticky_kind)) return false;
   const unsigned i = tracker_index(phys);
-  if (!g_tracker->armed[i].load(std::memory_order_acquire)) return false;
-  tracker_unprotect(phys);                      // writable first, then publish: a query that sees the flag re-arms safely
+  // A second writer can already have faulted when the first disarms the page.
+  // Only pages owned by the tracker qualify; unrelated faults still escape.
+  if (!g_tracker->generation[i]) return false;
+  tracker_unprotect(phys);
   g_tracker->armed[i].store(0, std::memory_order_release);
   g_tracker->dirty[i].store(1, std::memory_order_release);
+  g_tracker->generation[i] = g_generation.fetch_add(1, std::memory_order_acq_rel) + 1;
   g_tracker->page_epoch[i].store(next_write_epoch(), std::memory_order_release);
   n_tracker.fetch_add(1, std::memory_order_relaxed);
   return true;
@@ -535,6 +543,16 @@ void create_arena() {
 
 void apply_sticky() {
   std::lock_guard<std::mutex> lock(g_sticky_mutex);
+  std::lock_guard<std::mutex> track_lock(g_track_mutex);
+  // Changing the sticky policy must not leave a clean tracker flag for a page
+  // whose protection was removed by that policy.
+  if (g_tracker) for (unsigned i = 0; i < Tracker::kPages1 + Tracker::kPages2; ++i) {
+    if (!g_tracker->armed[i].load()) continue;
+    const uint32_t phys = i < Tracker::kPages1 ? i * 4096u : 0x10000000u + (i - Tracker::kPages1) * 4096u;
+    tracker_unprotect(phys);
+    g_tracker->armed[i] = 0;
+    g_tracker->dirty[i] = 1;
+  }
   // Release the previous policy.
   const unsigned old_n = g_sticky_count.load();
   for (unsigned i = 0; i < old_n; ++i) protect_sticky(g_sticky[i].phys_page << 12, PAGE_READWRITE);
@@ -588,19 +606,36 @@ HostWriteScope::HostWriteScope(void* pointer, size_t count) : range(pointer), by
       }
     }
   }
-  // Only armed pages carry state (an unarmed page is always re-stamped by the next query), so the lock is taken only for those.
+  // Pin the whole range until the kernel/host writer finishes. A render-thread
+  // query must not re-protect a page while ReadFile is writing into it.
   if (g_tracker) {
     for (uintptr_t p = first & ~uintptr_t(0xfff); p <= last; p += 4096) {
       Region r;
       if (!classify(p, r) || !ram_phys(r.phys)) continue;
-      if (!g_tracker->armed[tracker_index(r.phys)].load(std::memory_order_acquire)) continue;
       std::lock_guard<std::mutex> lock(g_track_mutex);
       const unsigned i = tracker_index(r.phys);
-      if (g_tracker->armed[i].load()) { tracker_unprotect(r.phys); g_tracker->armed[i] = 0; g_tracker->dirty[i] = 1; g_tracker->page_epoch[i].store(next_write_epoch(), std::memory_order_release); }
+      ++g_tracker->writers[i];
+      uint8_t sticky_kind;
+      if (g_tracker->armed[i].load() && !sticky_page(r.phys, &sticky_kind)) tracker_unprotect(r.phys);
+      g_tracker->armed[i] = 0;
+      g_tracker->dirty[i] = 1;
+      g_tracker->page_epoch[i].store(next_write_epoch(), std::memory_order_release);
     }
   }
 }
 HostWriteScope::~HostWriteScope() {
+  if (g_active && bytes && g_tracker) {
+    const uintptr_t first = reinterpret_cast<uintptr_t>(range), last = first + bytes - 1;
+    std::lock_guard<std::mutex> lock(g_track_mutex);
+    for (uintptr_t p = first & ~uintptr_t(0xfff); p <= last; p += 4096) {
+      Region r;
+      if (!classify(p, r) || !ram_phys(r.phys)) continue;
+      const unsigned i = tracker_index(r.phys);
+      g_tracker->dirty[i] = 1;
+      g_tracker->page_epoch[i].store(next_write_epoch(), std::memory_order_release);
+      --g_tracker->writers[i];
+    }
+  }
   if (!saved) return;
   for (unsigned i = 0; i < 4; ++i) if (saved & (1u << i)) protect_sticky(g_sticky[i].phys_page << 12, PAGE_READONLY);
 }
@@ -648,6 +683,7 @@ uint64_t native_ram_newest_write(const uint8_t* base, size_t bank_bytes, size_t 
     uint8_t sticky_kind;
     if (sticky_page(phys, &sticky_kind)) return UINT64_MAX;
     const unsigned i = tracker_index(phys);
+    if (t.writers[i]) return UINT64_MAX;
     if (t.faults[i] >= 16) return UINT64_MAX;  // written constantly: let the caller compare bytes
     if (t.armed[i].load(std::memory_order_acquire) && !t.dirty[i].load(std::memory_order_acquire)) {
       if (t.generation[i] > newest) newest = t.generation[i];
@@ -679,6 +715,7 @@ uint64_t native_ram_pages_epoch(const uint8_t* base, size_t bank_bytes, size_t o
   if (!ram_phys(first_phys) || !ram_phys(last_phys)) return UINT64_MAX;
   uint64_t newest = 0;
   for (uint32_t phys = first_phys & ~0xfffu; phys <= last_phys; phys += 4096) {
+    if (g_tracker->writers[tracker_index(phys)].load(std::memory_order_acquire)) return UINT64_MAX;
     const uint64_t e = g_tracker->page_epoch[tracker_index(phys)].load(std::memory_order_acquire);
     if (e > newest) newest = e;
   }

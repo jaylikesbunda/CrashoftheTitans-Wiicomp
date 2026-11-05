@@ -10,8 +10,10 @@
 #include <cstdio>
 #include <thread>
 #include <fstream>
+#include <atomic>
 #include "runtime/native_savestate.h"
 using namespace nwii::runtime;
+namespace nwii::runtime { uint64_t native_ram_pages_epoch(const uint8_t*, size_t, size_t, size_t); }
 #define CHECK(c) do{ if(!(c)){ std::printf("FAIL %s:%d %s%c",__FILE__,__LINE__,#c,10); std::fflush(stdout); std::exit(1);} }while(0)
 
 
@@ -31,6 +33,16 @@ static void ss_ram(native_ss::Stream& s, uint8_t* base, size_t bytes) {
 }
 
 static size_t count_events(uint8_t kind) { size_t n = 0; for (const Event& e : g_log) n += e.kind == kind; return n; }
+static std::atomic<DWORD> delayed_writer{0};
+static std::atomic<bool> fault_waiting{false}, release_fault{false};
+static LONG CALLBACK delay_write_fault(EXCEPTION_POINTERS* ep) {
+  if (ep->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION &&
+      GetCurrentThreadId() == delayed_writer.load()) {
+    fault_waiting = true;
+    while (!release_fault.load()) std::this_thread::yield();
+  }
+  return EXCEPTION_CONTINUE_SEARCH;
+}
 
 int main() {
   setvbuf(stdout, nullptr, _IONBF, 0);
@@ -158,6 +170,40 @@ int main() {
     }
     CHECK(untracked);
     std::printf("write tracker passed%c", 10);
+    // A write fault can already be pending when another writer disarms the
+    // page. Reproduce that ordering through the real Windows exception chain.
+    constexpr size_t race_off = 0x500000;
+    CHECK(native_ram_newest_write(base, m.mem1.size(), race_off, 4096) != UINT64_MAX);
+    void* handler = AddVectoredExceptionHandler(1, delay_write_fault); CHECK(handler);
+    std::thread writer([&] {
+      delayed_writer = GetCurrentThreadId();
+      *reinterpret_cast<volatile uint32_t*>(base + race_off) = 0x12345678;
+    });
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+    while (!fault_waiting.load()) { CHECK(std::chrono::steady_clock::now() < deadline); std::this_thread::yield(); }
+    base[race_off + 8] = 42; // disarms all aliases before the pending handler runs
+    const uint64_t epoch = native_ram_pages_epoch(base, m.mem1.size(), race_off, 4096);
+    release_fault = true; writer.join(); RemoveVectoredExceptionHandler(handler);
+    CHECK(base[race_off + 8] == 42);
+    CHECK(native_ram_pages_epoch(base, m.mem1.size(), race_off, 4096) > epoch);
+    // Host/kernel scopes pin pages across queries, including nested scopes.
+    {
+      native_arena::HostWriteScope outer(base + race_off, 4096);
+      CHECK(native_ram_newest_write(base, m.mem1.size(), race_off, 4096) == UINT64_MAX);
+      { native_arena::HostWriteScope inner(base + race_off, 4096); base[race_off] = 9; }
+      CHECK(native_ram_pages_epoch(base, m.mem1.size(), race_off, 4096) == UINT64_MAX);
+      MEMORY_BASIC_INFORMATION info{}; CHECK(VirtualQuery(base + race_off, &info, sizeof(info)));
+      CHECK(info.Protect == PAGE_READWRITE);
+    }
+    CHECK(native_ram_newest_write(base, m.mem1.size(), race_off, 4096) != UINT64_MAX);
+    // Re-arming from the render side races real stores through different RAM
+    // aliases. Each writer owns distinct bytes, so there is no C++ data race.
+    std::atomic<bool> done{false};
+    std::thread query([&] { for (int i = 0; i < 3000; ++i) native_ram_newest_write(base, m.mem1.size(), race_off + 4096, 4096); done = true; });
+    std::thread host([&] { unsigned n = 0; while (!done.load()) *reinterpret_cast<volatile uint32_t*>(base + race_off + 4096) = ++n; });
+    while (!done.load()) native_arena::st32(uint32_t(0x80000000u + race_off + 4104), 7);
+    query.join(); host.join();
+    std::printf("pending write fault, host scope pinning and concurrent re-arm passed%c", 10);
   }
   // ---- texture validation cost: tracker clean query versus byte comparison (NWII_TRACK_BENCH=1; measurement only) ----
   if (std::getenv("NWII_TRACK_BENCH") && (!std::getenv("NWII_ARENA_TRACK") || std::getenv("NWII_ARENA_TRACK")[0] != '0')) {

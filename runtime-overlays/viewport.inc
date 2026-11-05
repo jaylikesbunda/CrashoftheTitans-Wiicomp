@@ -1,10 +1,10 @@
 // NATIVE_GX_VIEWPORT_V1: XF viewport floats are raw IEEE words.
-struct NativeViewport {
+struct NativeViewportState {
   GLint x=0,y=0,width=640,height=kNativeEfbHeight;
   double near_depth=0,far_depth=1;
 };
-static NativeViewport NativeDecodeViewport(const uint32_t* xf) {
-  NativeViewport out;
+static NativeViewportState NativeDecodeViewport(const uint32_t* xf) {
+  NativeViewportState out;
   float v[6];
   for(unsigned i=0;i<6;++i) std::memcpy(v+i,xf+0x1a+i,4);
   // An untouched XF register file has no usable viewport yet. GX's ordinary
@@ -24,7 +24,7 @@ static NativeViewport NativeDecodeViewport(const uint32_t* xf) {
   out.far_depth=double(v[5])/max_depth;
   return out;
 }
-static NativeViewport NativeApplyViewport(const uint32_t* xf,int scale=1) {
+static NativeViewportState NativeApplyViewport(const uint32_t* xf,int scale=1) {
   const auto v=NativeDecodeViewport(xf);
   glViewport(v.x*scale,v.y*scale,v.width*scale,v.height*scale);
   glDepthRange(v.near_depth,v.far_depth);

@@ -4,6 +4,12 @@ Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versi
 date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
 inputs is always rebuilt rather than reused.
 
+## [0.1.6] - 2026-11-05
+
+- Fixed the NTSC crash caused by concurrent guest-memory tracking faults.
+- Fixed the NTSC display cutoff by applying the game's viewport dimensions and offsets.
+- Improved button capture startup and error messages; clarified when keyboard input needs Keyboard & mouse mode.
+
 ## [0.1.5] - 2026-11-05
 
 - Fixed builds failing when another Python installation was selected for glad.

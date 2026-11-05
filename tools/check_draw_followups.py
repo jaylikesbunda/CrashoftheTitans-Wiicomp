@@ -90,9 +90,14 @@ int main(){CPUContext ctx;g_ctx_ptr=&ctx;TextureCache cache;cache.register_efb_t
 #include <cassert>
 #include <limits>
 #include <iostream>
+#include <cmath>
+#include <cstring>
+#include <cstdint>
 #include "runtime/native_viewport_shadow.h"
 unsigned views=0,depths=0;
-void glViewport(GLint,GLint,GLsizei,GLsizei){++views;}void glDepthRange(GLdouble,GLdouble){++depths;}
+std::array<int,4> actual_view{};
+void glViewport(GLint x,GLint y,GLsizei w,GLsizei h){++views;actual_view={x,y,w,h};}void glDepthRange(GLdouble,GLdouble){++depths;}
+VIEWPORT_FRAGMENT
 int main(){NativeViewport(0,0,640,528);NativeViewport(0,0,640,528);assert(views==(native_viewport::enabled?1:2));
  NativeViewport(0,0,1920,1080);NativeViewport(0,0,640,528);assert(views==(native_viewport::enabled?3:4));
  native_viewport::Invalidate();NativeViewport(0,0,640,528);const auto before=views;
@@ -100,8 +105,23 @@ int main(){NativeViewport(0,0,640,528);NativeViewport(0,0,640,528);assert(views=
  NativeDepthRange(0,1);NativeDepthRange(0,1);assert(depths==(native_viewport::enabled?1:2));
  NativeDepthRange(1,0);native_viewport::Invalidate();NativeDepthRange(1,0);assert(depths==(native_viewport::enabled?3:4));
  const double nan=std::numeric_limits<double>::quiet_NaN();const auto d=depths;NativeDepthRange(nan,1);NativeDepthRange(nan,1);assert(depths==d+2);
+ uint32_t xf[256]{};
+ auto set=[&](float x,float y,float w,float h){float v[6]={w/2,-h/2,16777215,x+342+w/2,y+342+h/2,16777215};std::memcpy(xf+0x1a,v,sizeof(v));};
+ set(0,0,640,480);gx::NativeApplyViewport(xf,3);
+ assert((actual_view==std::array<int,4>{0,144,1920,1440})); // NTSC inside the 528-row EFB
+ set(0,0,640,528);gx::NativeApplyViewport(xf,2);
+ assert((actual_view==std::array<int,4>{0,0,1280,1056})); // PAL
+ set(12,16,600,448);gx::NativeApplyViewport(xf,1);
+ assert((actual_view==std::array<int,4>{12,64,600,448})); // guest offsets, no region constants
+ const auto applied=views;gx::NativeApplyViewport(xf,1);
+ assert(views==applied+(native_viewport::enabled?0:1));
  std::cout<<"Viewport/HUD restore, context invalidation, invalid size and reversed/NaN depth checks passed.\n";}
 '''
+    # Exercise the real namespace and stage-rewritten viewport fragment. A data
+    # type named NativeViewport used to shadow the GL wrapper here, silently
+    # constructing a temporary instead of applying the game's viewport.
+    helper=(a.port/'runtime-overlays/viewport.inc').read_text()
+    viewport=viewport.replace('VIEWPORT_FRAGMENT','namespace gx { constexpr int kNativeEfbHeight=528;\n'+stage.viewport(helper)+'\n}')
     with tempfile.TemporaryDirectory(prefix='draw-followups-') as tmp:
         tmp=Path(tmp);(tmp/'glad').mkdir();(tmp/'glad/glad.h').write_text('#pragma once\nusing GLint=int;using GLsizei=int;using GLdouble=double;void glViewport(GLint,GLint,GLsizei,GLsizei);void glDepthRange(GLdouble,GLdouble);\n')
         env=os.environ.copy();env['PATH']=str(winlibs_bin())+os.pathsep+env['PATH']

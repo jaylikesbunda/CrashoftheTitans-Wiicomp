@@ -789,7 +789,7 @@ function setBinding(key, name, add) {
 }
 function changed() { renderMapRows(); renderPlayers(); updateLive(); applyControls(); }
 
-function toggleCapture(key, add) {
+async function toggleCapture(key, add) {
   if (capturing && capturing.key === key && capturing.add === add) { endCapture(); return; }
   endCapture(true);
   if (kbView()) {
@@ -797,18 +797,27 @@ function toggleCapture(key, add) {
     renderMapRows(); updateLive();
     return;
   }
-  capturing = { key, add, started: Date.now(), timer: setInterval(pollCapture, 40) };
-  invoke("begin_capture").catch(() => {});
+  const request = capturing = { key, add, started: Date.now(), timer: null };
   renderMapRows(); updateLive();
+  try {
+    await invoke("begin_capture");
+    if (capturing === request) request.timer = setInterval(pollCapture, 40);
+  } catch (error) {
+    if (capturing === request) { endCapture(); toast("Could not capture controller input: " + String(error), true); }
+  }
 }
 async function pollCapture() {
-  if (!capturing) return;
-  if (Date.now() - capturing.started > 8000) { endCapture(); toast("No button pressed."); return; }
+  if (!capturing || capturing.kb || capturing.polling) return;
+  const request = capturing;
+  if (Date.now() - request.started > 8000) { endCapture(); toast("No controller button detected. For keys, select Keyboard & mouse."); return; }
+  request.polling = true;
   try {
     const name = await invoke("poll_capture");
-    if (!capturing || !name) return;
+    if (capturing !== request || !name) return;
     const { key, add } = capturing; endCapture(true); setBinding(key, name, add);
-  } catch { endCapture(); }
+  } catch (error) {
+    if (capturing === request) { endCapture(); toast("Could not read controller input: " + String(error), true); }
+  } finally { request.polling = false; }
 }
 function endCapture(quiet) {
   if (!capturing) return;
