@@ -328,6 +328,13 @@ PSQ_REG_STORE = re.compile(r'ctx\.psq_store\((\d+), ((?:g\d+|ctx\.gpr\[\d+\])) \
 PSQ_BACK = re.compile(r'ctx\.(psq_store_fifo_reg|psq_store_fifo|native_batch_psq_store_fifo)\(')
 PSQ_FORWARD = {'psq_store_val': 'psq_store_fifo', 'native_batch_psq_store_zero': 'native_batch_psq_store_fifo'}
 PSQ_REVERSE = {'psq_store_fifo': 'psq_store_val', 'native_batch_psq_store_fifo': 'native_batch_psq_store_zero', 'psq_store_fifo_reg': 'psq_store'}
+# NATIVE_ARENA_PIPE_UPDATE_V1: an update-form store (stwu/stfsu/psq_stu rS, d(rN)) is generated as `uint32_t ea = rN + d;`, the
+# store through ea, then `rN = ea;`. ea is a pipe address when rN is one or d is the pipe displacement, and rN then stays one, so
+# the stores that follow through 0(rN) (GXLoadPosMtxImm and friends) take the write-gather path instead of trapping in the arena.
+EA_DEF = re.compile(r'^\s*uint32_t ea = ((?:g\d+|ctx\.gpr\[\d+\])) \+ (-?\d+);')
+EA_ANY = re.compile(r'^\s*uint32_t ea = ')
+EA_COPY = re.compile(r'^\s*((?:g\d+|ctx\.gpr\[\d+\])) = ea;')
+PSQ_EA_STORE = re.compile(r'ctx\.(psq_store_val|native_batch_psq_store_zero)\((?=[^;]*?, ea, )')
 
 
 def restore_generated(text):
@@ -354,6 +361,7 @@ def arena_source(text, slow):
     """Rewrite checked guest stores into arena stores, function by function. Hardware-touching functions keep the checked path."""
     text = restore_generated(text)
     out, io, pipe, high_base, low_base = [], False, set(), set(), set()
+    ea_pipe = False
     changed = False
     for line in text.splitlines(keepends=True):
         match = FUNCTION.match(line)
@@ -362,6 +370,7 @@ def arena_source(text, slow):
             pipe = set()
             high_base = set()
             low_base = set()
+            ea_pipe = False
         if io:
             out.append(line)
             continue
@@ -370,6 +379,10 @@ def arena_source(text, slow):
             low_base.discard(any_assign[1])
             if LOW_BASE.match(line):
                 low_base.add(any_assign[1])
+        if EA_ANY.match(line):
+            ea_def = EA_DEF.match(line)
+            ea_pipe = bool(ea_def and (ea_def[1] in pipe or int(ea_def[2]) == -32768))
+        ea_copy = EA_COPY.match(line)
         constant = PIPE_CONST.match(line)
         high = PIPE_HIGH.match(line)
         ori = PIPE_ORI.match(line)
@@ -380,6 +393,9 @@ def arena_source(text, slow):
         elif PIPE_ADD.match(line) and PIPE_ADD.match(line)[2] in pipe:
             pipe.add(PIPE_ADD.match(line)[1])
             high_base.discard(PIPE_ADD.match(line)[1])
+        elif ea_copy and ea_pipe:
+            pipe.add(ea_copy[1])
+            high_base.discard(ea_copy[1])
         else:
             assigned = ASSIGN.match(line)
             if assigned:
@@ -400,11 +416,15 @@ def arena_source(text, slow):
             if not fifo and pipe and m[1] in FIFO_NAMES:
                 base = re.match(r'((?:g\d+|ctx\.gpr\[\d+\]))(?: \+ 0)?[,)]', after)
                 fifo = bool(base and base[1] in pipe)
+            if not fifo and ea_pipe and m[1] in FIFO_NAMES and after.startswith('ea,'):
+                fifo = True
             return 'native_arena::' + (FIFO_NAMES[m[1]] if fifo else STORE_NAMES[m[1]]) + '(ctx.mmu, '
         new = MMU_STORE.sub(store, line)
         new = PSQ_STORE.sub(lambda m: 'ctx.' + PSQ_FORWARD[m[1]] + '(', new)
         new = PSQ_REG_STORE.sub(lambda m: 'ctx.psq_store_fifo_reg(' + m[1] + ', ' + m[0][m[0].index(m[2]):] if m[2] in pipe else m[0], new)
         new = PSQ_PIPE_STORE.sub(lambda m: 'ctx.' + PSQ_FORWARD[m[1]] + '(' if m[2] in pipe else m[0], new)
+        if ea_pipe:
+            new = PSQ_EA_STORE.sub(lambda m: 'ctx.' + PSQ_FORWARD[m[1]] + '(', new)
         changed |= new != line
         out.append(new)
     return ''.join(out) if changed else text

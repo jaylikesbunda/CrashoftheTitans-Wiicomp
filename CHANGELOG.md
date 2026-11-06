@@ -4,6 +4,10 @@ Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versi
 date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
 inputs is always rebuilt rather than reused.
 
+## [0.1.8] - 2026-11-06
+
+- Improved performance: GX matrix uploads now write straight to the GPU FIFO instead of trapping on every store (about 40% higher frame rate in gameplay at a 120 FPS limit).
+
 ## [0.1.7] - 2026-11-06
 
 - Fixed Aku Aku blocking on foot: the fallback interpreter now runs the condition-register logic instructions (cror and friends) instead of skipping them.

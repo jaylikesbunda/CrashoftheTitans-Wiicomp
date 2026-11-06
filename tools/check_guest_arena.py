@@ -106,6 +106,22 @@ def check_text():
         '    ctx.mmu.write32(g5, g0); // the base changed: ordinary\n'
         '    ctx.mmu.write_f64(ea, f1);\n'
         '    ctx.psq_store_val(f2, p2, g30 + -32768, 0, 0);\n'
+        '    g4 = g9;\n'
+        '    {\n'
+        '        uint32_t ea = g4 + -32768;\n'
+        '        ctx.mmu.write32(ea, g6); // stwu: pipe by displacement\n'
+        '        g4 = ea;\n'
+        '    }\n'
+        '    ctx.mmu.write32(g4 + 0, g6); // through the updated pipe base\n'
+        '    ctx.native_batch_psq_store_zero(f5, p5, g4 + 0, 0, 0);\n'
+        '    {\n'
+        '        uint32_t ea = g3 + 16;\n'
+        '        ctx.mmu.write32(ea, g6); // stwu: ordinary\n'
+        '        g3 = ea;\n'
+        '    }\n'
+        '    ctx.mmu.write32(g3 + 0, g6); // ordinary updated base\n'
+        '    g4 = g8;\n'
+        '    ctx.mmu.write32(g4 + 0, g6); // pipe base overwritten\n'
         '}\n'
         'NWII_GUEST_ABI void func_803B4020(NWII_CTX_PARAM ctx) {\n'
         '    ctx.mmu.write32(g3 + 8, g4); // a hardware-touching function keeps the checked store\n'
@@ -113,7 +129,10 @@ def check_text():
     out = F.arena_source(body, F.slow_functions(PORT))
     for want in ('native_arena::st32(ctx.mmu, g3 + 8, g4)', 'native_arena::fifof32(ctx.mmu, g29 + -32768,', 'native_arena::fifo8(ctx.mmu, ctx.gpr[7] + -32768,',
                  'native_arena::fifo32(ctx.mmu, g5, g0); // pipe by a known base', 'native_arena::st32(ctx.mmu, g5, g0); // the base changed', 'native_arena::stf64(ctx.mmu, ea, f1)',
-                 'ctx.psq_store_fifo(f2, p2, g30 + -32768', 'ctx.mmu.write32(g3 + 8, g4); // a hardware-touching'):
+                 'ctx.psq_store_fifo(f2, p2, g30 + -32768', 'ctx.mmu.write32(g3 + 8, g4); // a hardware-touching',
+                 'native_arena::fifo32(ctx.mmu, ea, g6); // stwu: pipe', 'native_arena::fifo32(ctx.mmu, g4 + 0, g6); // through the updated',
+                 'ctx.native_batch_psq_store_fifo(f5, p5, g4 + 0', 'native_arena::st32(ctx.mmu, ea, g6); // stwu: ordinary',
+                 'native_arena::st32(ctx.mmu, g3 + 0, g6); // ordinary updated', 'native_arena::st32(ctx.mmu, g4 + 0, g6); // pipe base overwritten'):
         assert want in out, want
     assert F.restore_generated(out) == body, 'generated text restore is not exact'
     assert F.arena_source(out, F.slow_functions(PORT)) == out, 'rewrite is not idempotent'

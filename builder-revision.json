@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": "2026.11.06-1",
+  "revision": "2026.11.06-2",
   "required_inputs": {
     "tools/fix_guest_batch.py": "619822f9aa655f930ec02fbf8fb488fbeac86c9a8c5807d9dea113fa7d2ba81d",
     "tools/guest_batch_lowering.py": "2438f7dee71d780e8351b3ed3e7c7768da1e069fbde0142f8afe4a3dc92f38b5",
@@ -66,7 +66,7 @@
     "runtime-overlays/input_mapping.h": "5f6027da05c1a304c24e0b12f39603ec1a0a69379a03ae25a9ce06228ece7a95",
     "tools/build_native.py": "2a2f9d3191c893f6db42f4b96109542dc80d65d2ddfb8c6f648ba32b95690277",
     "tools/clean_room_build.py": "98ddf37f17b29b790f4ad59e1eda31f01f25d9c3b27e8aa2d80a6ed39a035ebc",
-    "tools/builder_revision.py": "9088f0711e77381b2de6d67271a432bbce1f250b6c12ace857066164fce0dc56",
+    "tools/builder_revision.py": "975b951a0a510bec9b57d042bdac577060db99b947df02eb91c81d9aeadb3291",
     "tools/fix_interpreter_crlogic.py": "dfeb69b3d1cc2846a400f1a367d1c1d117ba7aafa8c6fa915418a314d355d88b",
     "tools/build_resources.py": "01762902aff5b83117b5c2d846e0e95827e46e351c82520e19ee0f88e7b2e4ab",
     "tools/fix_parse_work_reuse.py": "17b8f05af543373bd19df880372dae7f00c1f836a3c2081879c3c2219f65fe90",
@@ -321,8 +321,8 @@
     "data/regions/RQJE7D/release.json": "bab72e653e9adceaa80bc250592e54d184186a7004a0c4c2e2a322858b012dfa",
     "data/regions/RQJE7D/function-index.tsv": "e126bdcc783d9fa49de7905d60bad5e0141d3884828009ba6ee6f51cbd91e436",
     "data/regions/RQJE7D/address-map.tsv": "9bac730043a87a7ab4a52c61fd90ce9fe1407f45b7a368ce9cb836d4c61ac12e",
-    "tools/fix_guest_arena.py": "984573c7a28cf0408dd389ebc08b8977038ed500e9e1c532fcf4636ce667d062",
-    "tools/check_guest_arena.py": "af5d1961359aaf1fc89bac22c058c0d3fa006166790d9d2cd828521628e32f21",
+    "tools/fix_guest_arena.py": "68416c16e0d04926447c879a23bf85820c3d08d3909fbedd6e56148ba9b93a47",
+    "tools/check_guest_arena.py": "e45370e124a92e8f2f13ba139d6f9d30c6f91090f7593c77469b567d6639c474",
     "runtime-overlays/native_guest_arena.h": "23dcff58bc629031f09342e82478bc81211676e747e6a741b79836a77be6c543",
     "runtime-overlays/native_guest_arena_fifo.h": "f3c4234aca84908165f079f9fa22aab34b2b020ad6fc861fe88dc5d7424af1bd",
     "runtime-overlays/native_guest_arena.cpp": "518b4f1d8c084603a619a84a29e13e263c14559228e484ca96449280b54bd895",
