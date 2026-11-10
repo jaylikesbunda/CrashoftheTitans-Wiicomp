@@ -141,6 +141,10 @@ struct HostWriteScope {
   HostWriteScope(const HostWriteScope&) = delete;
   HostWriteScope& operator=(const HostWriteScope&) = delete;
 };
+// NATIVE_TRACKER_USER_FAST_V1: true when no page of [pointer, pointer+count) is armed by the write tracker or sticky (page 0,
+// watch span), so a user-mode host store there needs no HostWriteScope: it behaves like a guest store to the same pages (a page
+// armed after this check traps and is recorded by the handler). No lock, no syscall. Kernel writes must still use the scope.
+bool host_write_unarmed(void* pointer, size_t count);
 struct Stats {
   uint64_t loads = 0, stores = 0, mmio = 0, wgpipe = 0, sticky = 0, tracker = 0, unhandled = 0, sites = 0;
 };

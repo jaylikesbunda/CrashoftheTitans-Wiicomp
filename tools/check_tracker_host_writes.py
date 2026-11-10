@@ -58,6 +58,8 @@ def main(argv):
               '%s: one marker per edit%s' % (rel, ' plus the include' if rel in fx.INCLUDES else ''))
         check(text.count('/* END_' + fx.MARK + ':') == text.count('/* ' + fx.MARK + ':'), '%s: every marker closed' % rel)
         check(text.count('HostWriteScope tracker_scope') == n_edits, '%s: %d scope(s)' % (rel, n_edits))
+        user = {'hw/hw_dsp.cpp': 2, 'hle/gx.cpp': 1, 'hle/interpreter.cpp': 2}.get(rel, 0)  # NATIVE_TRACKER_USER_FAST_V1
+        check(text.count('native_arena::host_write_unarmed(') == user, '%s: %d user-mode fast path(s); kernel writes keep the scope' % (rel, user))
         # Each edit adds balanced braces: the added text is a full statement block.
         added = fx.BLOCK.findall(text)
         unbalanced = [tag for tag, _, body in added if body.count('{') != body.count('}')]

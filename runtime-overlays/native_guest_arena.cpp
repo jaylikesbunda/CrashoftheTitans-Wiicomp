@@ -592,6 +592,19 @@ Stats stats() {
   return s;
 }
 
+bool host_write_unarmed(void* pointer, size_t count) {
+  if (!g_active || !count) return true;
+  const uintptr_t first = reinterpret_cast<uintptr_t>(pointer), last = first + count - 1;
+  for (uintptr_t p = first & ~uintptr_t(0xfff); p <= last; p += 4096) {
+    Region r;
+    if (!classify(p, r) || !ram_phys(r.phys)) continue;
+    uint8_t kind;
+    if (sticky_page(r.phys, &kind)) return false;
+    if (g_tracker && g_tracker->armed[tracker_index(r.phys)].load(std::memory_order_acquire)) return false;
+  }
+  return true;
+}
+
 HostWriteScope::HostWriteScope(void* pointer, size_t count) : range(pointer), bytes(count), saved(0) {
   if (!g_active || !count) return;
   const uintptr_t first = reinterpret_cast<uintptr_t>(pointer), last = first + count - 1;

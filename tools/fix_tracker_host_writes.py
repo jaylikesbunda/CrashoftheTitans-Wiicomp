@@ -25,22 +25,33 @@ INCLUDE = '#include "runtime/native_guest_arena.h" // ' + MARK
 port = Path(__file__).resolve().parents[1]
 
 SCOPE = 'native_arena::HostWriteScope tracker_scope'
+
+
+def user_write(pointer, count, statement):
+    """A user-mode host store (memcpy/memset/memmove in this process). NATIVE_TRACKER_USER_FAST_V1: when no page of the range
+    is armed or sticky it runs bare, like a guest store to the same pages; otherwise it takes the full scope. A page armed after
+    the check makes the store fault, and the arena handler records it exactly as it records a guest store. Kernel writes (disc
+    reads) keep the scope unconditionally: the kernel cannot recover from a protection fault."""
+    return '{ if (native_arena::host_write_unarmed(%s, %s)) %s else { %s(%s, %s); %s } }' % (
+        pointer, count, statement, SCOPE, pointer, count, statement)
+
+
 FILES = {
     'hw/hw_dsp.cpp': [
         ('dsp_to_mem2', 'if (!dir) std::memcpy(mem2 + ar_a, mem1 + mm, copy_count);',
-         'if (!dir) { %s(mem2 + ar_a, copy_count); std::memcpy(mem2 + ar_a, mem1 + mm, copy_count); }' % SCOPE),
+         'if (!dir) ' + user_write('mem2 + ar_a', 'copy_count', 'std::memcpy(mem2 + ar_a, mem1 + mm, copy_count);')),
         ('dsp_to_mem1', 'else std::memcpy(mem1 + mm, mem2 + ar_a, copy_count);',
-         'else { %s(mem1 + mm, copy_count); std::memcpy(mem1 + mm, mem2 + ar_a, copy_count); }' % SCOPE),
+         'else ' + user_write('mem1 + mm', 'copy_count', 'std::memcpy(mem1 + mm, mem2 + ar_a, copy_count);')),
     ],
     'hle/gx.cpp': [
         ('gather', '    std::memcpy(dst,&be,bytes);',
-         '    { %s(dst, bytes); std::memcpy(dst,&be,bytes); }' % SCOPE),
+         '    ' + user_write('dst', 'bytes', 'std::memcpy(dst,&be,bytes);')),
     ],
     'hle/interpreter.cpp': [
         ('bulk_copy', '    std::memmove(d,r,n);return true;',
-         '    { %s(d, n); std::memmove(d,r,n); }return true;' % SCOPE),
+         '    ' + user_write('d', 'n', 'std::memmove(d,r,n);') + 'return true;'),
         ('bulk_fill', '    std::memset(d,value,n);return true;',
-         '    { %s(d, n); std::memset(d,value,n); }return true;' % SCOPE),
+         '    ' + user_write('d', 'n', 'std::memset(d,value,n);') + 'return true;'),
     ],
     'hle/ios.cpp': [
         ('disc_zero', '    std::memset(dst, 0, length);',
@@ -75,9 +86,14 @@ def block(tag, original, new, eol):
 
 
 def edit(text, tag, old, new):
-    """Replace the one-line `old` by a restorable block holding `new`; a no-op when this tag is already applied."""
-    if f'/* {MARK}:{tag} ' in text:
-        return text
+    """Replace the one-line `old` by a restorable block holding `new`; an applied block whose text differs is refreshed."""
+    applied = [m for m in BLOCK.finditer(text) if m.group(1) == tag]
+    if applied:
+        m = applied[0]
+        eol = '\r\n' if '\r\n' in text else '\n'
+        original = base64.b64decode(m.group(2)).decode('utf-8', 'surrogateescape')
+        fresh = block(tag, original, new, eol)
+        return text if m.group(0) == fresh else text[:m.start()] + fresh + text[m.end():]
     eol = '\r\n' if '\r\n' in text else '\n'
     old = old.replace('\n', eol)
     assert text.count(old) == 1, (tag, text.count(old))
@@ -105,7 +121,7 @@ def apply(rt):
             text = prepend_include(text)
         if text != read(path):
             write(path, text)
-    print('Tracker host writes: DMA, gather, bulk helpers and disc reads run under HostWriteScope.')
+    print('Tracker host writes: DMA, gather, bulk helpers and disc reads run under HostWriteScope (user-mode stores skip it on unarmed pages).')
 
 
 def restore(rt):

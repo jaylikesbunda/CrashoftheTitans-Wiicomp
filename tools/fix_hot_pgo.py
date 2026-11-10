@@ -1,4 +1,5 @@
-"""NATIVE_HOT_PGO_V1: opt-in GCC profile-guided optimisation of the promoted hot guest units (build/crash-hot/hot_*.cpp).
+"""NATIVE_HOT_PGO_V1: GCC profile-guided optimisation of the promoted hot guest units (build/crash-hot/hot_*.cpp) and of the
+guest chunks (build/crash-split/output_*.cpp, else build/crash-generated/output_*.cpp; NWII_PGO_SCOPE=hot restricts to the hot units).
 
 Nothing here changes guest semantics: only compiler flags (and, in generate mode, one extra translation unit that flushes
 the profile). The floating-point/aliasing flags of the hot units are untouched (-ffp-contract=off, -fwrapv,
@@ -24,6 +25,8 @@ Environment:
                        Default on. A unit is profiled only while its text matches the committed profile, so after any stage change that rewrites
                        hot units (the default arena did) the profile must be retaken: generate, play, --collect, --ship RQJP7D.
   NWII_PGO_OPT         O2 (default) | Os | O1 - the level of BOTH generate and use; GCC requires the same CFG in both
+  NWII_PGO_SCOPE       all (default: hot units + guest chunks) | hot (the original hot-units-only scope)
+  NWII_PGO_SHIPPED     directory holding the shipped profiles (default: <port>/data/pgo; for tests)
   NWII_PGO_BUILD       staged tree root (default: <port>/build; for tests)
   NWII_PGO_DIR         profile store (default: <build>/pgo)
   NWII_PGO_DROP_COLD   1: remove __attribute__((cold)) from native_guest_resume_* (reversible; use in generate AND use)
@@ -47,6 +50,8 @@ END = '# END_NATIVE_HOT_PGO_V1'
 NL = '\n'
 BUILD = Path(os.environ.get('NWII_PGO_BUILD') or PORT / 'build')   # staged tree root (override for tests)
 HOT = BUILD / 'crash-hot'
+GEN = BUILD / 'crash-generated'
+SPLIT = BUILD / 'crash-split'
 CMAKE = BUILD / 'nwii-full-source/CMakeLists.txt'
 DUMP_TU = PORT / 'runtime-overlays/native_pgo_dump.cpp'
 UNCOLD = re.compile(r'(__attribute__\(\(noinline,)cold,(optimize\("O2"\)\)\) void native_guest_resume_)')
@@ -72,6 +77,24 @@ def hot_files():
     return sorted(HOT.glob('hot_*.cpp'))
 
 
+def chunk_files():
+    """The guest chunks exactly as fix_chunk_size_flags.py lists them: the split copy when one exists, else the generated file."""
+    return sorted((SPLIT / c.name if (SPLIT / c.name).exists() else c) for c in GEN.glob('output_*.cpp'))
+
+
+def unit_files():
+    """Every translation unit this stage profiles. NWII_PGO_SCOPE=hot restricts it to the promoted hot units (the original scope);
+    the default also covers the guest chunks, which are most of the guest code and were compiled for size without a profile."""
+    return hot_files() + (chunk_files() if os.environ.get('NWII_PGO_SCOPE', 'all') != 'hot' else [])
+
+
+GCDA_PATH_LIMIT = 250   # libgcov writes/reads <object path>.gcda; Windows fails beyond MAX_PATH (260) and the profile is silently lost
+
+
+def gcda_fits(source):
+    return len(str(object_dir(source) / (source.name + '.gcda'))) <= GCDA_PATH_LIMIT
+
+
 def read(path):
     return path.read_bytes().decode('utf-8', 'surrogateescape')
 
@@ -82,6 +105,40 @@ def write(path, text):
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+PIN = re.compile(r'#line 1 "[^"\r\n]*"\r?\n')
+
+
+def strip_pin(text):
+    m = PIN.match(text)
+    return text[m.end():] if m else text
+
+
+def unit_sha(path):
+    """sha256 of a unit's text with this stage's `#line` pin removed and the install path replaced, so the hash is the same in any
+    install folder (the generated chunks #include overlay headers by absolute path)."""
+    text = strip_pin(read(path))
+    for root in {PORT, PORT.resolve()}:
+        for form in {root.as_posix(), str(root), str(root).replace(chr(92), chr(92) * 2)}:
+            text = re.sub(re.escape(form), '@PORT@', text, flags=re.I)
+    return hashlib.sha256(text.encode('utf-8', 'surrogateescape')).hexdigest()
+
+
+def pin(files, enable):
+    """Reversible. GCC keys every function's profile on the source file name it was compiled under (coverage.cc folds it into the line
+    checksum), so a profile taken in one install folder is ignored in another ("source locations for function have changed").
+    A `#line 1 "<unit name>"` first line makes those names folder-independent. Returns the number of files touched."""
+    touched = 0
+    for f in files:
+        t = read(f)
+        base = strip_pin(t)
+        eol = chr(13) + chr(10) if chr(13) + chr(10) in base[:4096] else NL
+        n = ('#line 1 "' + f.name + '"' + eol + base) if enable else base
+        if n != t:
+            write(f, n)
+            touched += 1
+    return touched
 
 
 def gcc_version():
@@ -125,8 +182,8 @@ def write_block(files, options, extra=''):
     write(CMAKE, t.rstrip(NL) + NL + block)
 
 
-SHIPPED = PORT / 'data/pgo'
-SHIPPED_MIN_SHARE = 0.5   # a shipped profile is used only when at least this share of the hot units still match it
+SHIPPED = Path(os.environ.get('NWII_PGO_SHIPPED') or PORT / 'data/pgo')
+SHIPPED_MIN_SHARE = 0.5   # a shipped profile is used only when at least this share of ITS units still match the staged text
 
 
 def manifest_path():
@@ -134,6 +191,7 @@ def manifest_path():
 
 
 def cmd_off():
+    pin(unit_files(), False)
     if CMAKE.exists():
         write(CMAKE, strip_block(read(CMAKE)))
     print('hot PGO stage off: CMake block removed')
@@ -141,13 +199,17 @@ def cmd_off():
 
 def current_manifest(opt):
     return dict(schema=1, opt=opt, compiler=gcc_version(), dropped_cold=os.environ.get('NWII_PGO_DROP_COLD') == '1',
-                units={f.name: sha(f) for f in hot_files()})
+                units={f.name: unit_sha(f) for f in unit_files()})
 
 
 def cmd_generate(opt):
-    files = hot_files()
-    if not files:
+    files = unit_files()
+    if not hot_files():
         raise SystemExit('no build/crash-hot/hot_*.cpp - stage the sources first (build_native.py --stage-only)')
+    short = [f.name for f in files if not gcda_fits(f)]
+    if short:
+        print(f'WARNING: {len(short)} unit(s) have a .gcda path over {GCDA_PATH_LIMIT} characters and would lose their profile; '
+              f'use a shorter NWII_BUILD_STORAGE (e.g. C:\\ctb): {short[:4]}')
     if not DUMP_TU.is_file():
         raise SystemExit('missing ' + str(DUMP_TU))
     drop = os.environ.get('NWII_PGO_DROP_COLD') == '1'
@@ -164,6 +226,7 @@ def cmd_generate(opt):
     options = ['-' + opt, '-fprofile-generate', '-fprofile-update=single'] + (['-fno-profile-values'] if os.environ.get('NWII_PGO_NO_VALUES') == '1' else [])
     extra = 'target_sources(CrashNative PRIVATE "' + DUMP_TU.as_posix() + '")' + NL + 'target_link_options(CrashNative PRIVATE -fprofile-generate)' + NL
     write_block(files, options, extra)
+    pin(files, True)
     print(f'generate: {len(files)} hot units instrumented at -{opt}; manifest {manifest_path()}')
     print('next: cmake --build', toolchain(), '--target CrashNative')
 
@@ -172,8 +235,9 @@ def cmd_collect():
     manifest = json.loads(manifest_path().read_text())
     store_dir().mkdir(parents=True, exist_ok=True)
     copied, missing = 0, []
+    where = {f.name: f for f in unit_files()}
     for name in manifest['units']:
-        src = object_dir(HOT / name) / (name + '.gcda')
+        src = object_dir(where.get(name, HOT / name)) / (name + '.gcda')
         if src.is_file():
             shutil.copy2(src, store_dir() / (name + '.gcda'))
             copied += 1
@@ -215,13 +279,13 @@ def cmd_shipped(opt):
             pass
         print('hot PGO (shipped profile) not used: ' + why)
     try:
-        files = hot_files()
-        if not files:
+        files = unit_files()
+        if not hot_files():
             return skip('no staged hot units')
         if not SHIPPED.is_dir():
             return skip('no shipped profile')
-        uncold(files, False)
-        now = dict(units={f.name: sha(f) for f in files}, compiler=gcc_version())
+        uncold(hot_files(), False)
+        now = dict(units={f.name: unit_sha(f) for f in files}, compiler=gcc_version())
         best = None
         for d in sorted(p for p in SHIPPED.iterdir() if p.is_dir()):
             try:
@@ -234,12 +298,15 @@ def cmd_shipped(opt):
             except Exception:
                 continue
             if best is None or len(good) > len(best[1]):
-                best = (d, good)
-        if best is None or len(best[1]) < SHIPPED_MIN_SHARE * len(files):
-            return skip('no shipped profile matches this build (%d of %d units)' % (len(best[1]) if best else 0, len(files)))
-        use = []
+                best = (d, good, len(m['units']))
+        if best is None or len(best[1]) < SHIPPED_MIN_SHARE * max(1, best[2]):
+            return skip('no shipped profile matches this build (%d of %d profiled units)' % (len(best[1]) if best else 0, best[2] if best else 0))
+        use, too_long = [], 0
         for f in files:
             if f.name in best[1]:
+                if not gcda_fits(f):   # the profile could not be read back at this path; compile the unit normally
+                    too_long += 1
+                    continue
                 dest = object_dir(f)
                 dest.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(best[0] / (f.name + '.gcda'), dest / (f.name + '.gcda'))
@@ -247,7 +314,10 @@ def cmd_shipped(opt):
         options = ['-' + opt, '-fprofile-use', '-fprofile-correction', '-fprofile-partial-training',
                    '-Wno-missing-profile', '-Wno-coverage-mismatch', '-Wno-error=coverage-mismatch']
         write_block(use, options)
-        print(f'hot PGO (shipped profile {best[0].name}): {len(use)} of {len(files)} hot units compiled with a profile at -{opt}')
+        pin(use, True)
+        pin([f for f in files if f not in use], False)
+        print(f'hot PGO (shipped profile {best[0].name}): {len(use)} of {len(files)} units compiled with a profile at -{opt}'
+              + (f'; {too_long} left unprofiled (profile path over {GCDA_PATH_LIMIT} characters)' if too_long else ''))
     except Exception as e:
         skip('%s: %s' % (type(e).__name__, e))
 
@@ -261,8 +331,8 @@ def cmd_use(opt):
     drop = os.environ.get('NWII_PGO_DROP_COLD') == '1'
     if bool(manifest.get('dropped_cold')) != drop:
         raise SystemExit('NWII_PGO_DROP_COLD differs from the profiling run')
-    files = hot_files()
-    uncold(files, drop) if drop else uncold(files, False)
+    files = unit_files()
+    uncold(hot_files(), drop) if drop else uncold(hot_files(), False)
     now = current_manifest(opt)
     if now['compiler'] != manifest['compiler']:
         raise SystemExit('compiler changed: ' + manifest['compiler'] + ' -> ' + now['compiler'])
@@ -272,7 +342,7 @@ def cmd_use(opt):
     use, unprofiled = [], []
     for f in files:
         g = store_dir() / (f.name + '.gcda')
-        if f.name in stale or not g.is_file():
+        if f.name in stale or not g.is_file() or not gcda_fits(f):
             unprofiled.append(f.name)
             continue
         dest = object_dir(f)
@@ -281,6 +351,8 @@ def cmd_use(opt):
         use.append(f)
     options = ['-' + opt, '-fprofile-use', '-fprofile-correction', '-fprofile-partial-training', '-Werror=missing-profile']
     write_block(use, options)
+    pin(use, True)
+    pin([f for f in files if f not in use], False)
     print(f'use: {len(use)} hot units compiled with profile at -{opt}; {len(unprofiled)} left unprofiled {unprofiled[:6]}')
     print('next: cmake --build', toolchain(), '--target CrashNative')
 

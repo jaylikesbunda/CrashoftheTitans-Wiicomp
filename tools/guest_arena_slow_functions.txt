@@ -1,0 +1,14 @@
+# Functions that keep the checked (software) store path instead of arena stores, read by tools/fix_guest_arena.py.
+# Their hardware stores otherwise trap on every write: gameplay fault-site report (L1_E1, 120 FPS limit, v0.1.8), mapped by host RVA.
+803c7a78  # 25% of traps: CP/PI FIFO registers 0xCC000002, 0xCC00300C/3010/3014
+803c7b40  # 25%: CP/PI FIFO registers 0xCC000002/0004, 0xCC00300C/3010/3014
+803dd400  # 19%: DSP mailbox 0xCC005000/5002
+803ba864  # 11%: watched page-0 word 0x800000E4 (OS current thread)
+803e2b30  # 1%: Hollywood register 0xCD000004
+# Interrupt and audio paths that trap once the four above stop trapping (same scene, report of the rebuilt runtime):
+803c8f30  # PE interrupt status 0xCC00100A
+803c8e68  # PE interrupt status 0xCC00100A
+803dd698  # DSP control 0xCC00500A
+803d4844  # DSP control 0xCC00500A
+803d4608  # audio DMA 0xCC005030/5032/5036
+803c1010  # VI 0xCC002030/2034
