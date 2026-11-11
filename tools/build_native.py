@@ -554,7 +554,7 @@ run('native-fallback-gates-stage',[sys.executable,PORT/'tools/fix_fallback_gates
 # NATIVE_DIRECT_TEXCOORD_LOADER_V1: direct F32 position/normal with one indexed F32 texcoord set picks its readers at compile time.
 # Runs last among the fifo_parser stages; harness: tools/check_direct_texcoord_loader.py, byte oracle: check_format_loaders.py.
 run('native-direct-texcoord-stage',[sys.executable,PORT/'tools/fix_direct_texcoord_loader.py'])
-if os.environ.get('NWII_BUILD_RENDER_STATE_SPLIT')=='1':  # opt-in (default off)
+if os.environ.get('NWII_BUILD_RENDER_STATE_SPLIT')!='0':  # default on: the GL thread moves drawing off the thread that raises the guest's draw-done signals. NWII_BUILD_RENDER_STATE_SPLIT=0 opts out; at runtime NWII_NO_RENDER_QUEUE=1 (or the launcher's safe GPU sync) keeps drawing on the main thread
     run('native-renderer-state-split-stage',[sys.executable,PORT/'tools/fix_renderer_state_split.py'])  # NATIVE_RENDERER_STATE_SPLIT_V1: renderer-owned GX state (output-neutral; harness: tools/check_renderer_state_split.py)
     # NATIVE_TEXTURE_CPU_GL_SPLIT_V1: texture lookup/validation/decode before the early PE signal; GL upload/bind in Render.
     # Needs the state split (it uses RenderState()). Reversible; harness: tools/check_texture_cpu_gl_split.py.

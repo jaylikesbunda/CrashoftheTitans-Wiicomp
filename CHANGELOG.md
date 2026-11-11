@@ -4,6 +4,13 @@ Notable changes to Crash of the Titans WiiComp. The launcher uses semantic versi
 date-serial that pins the exact bytes of every build input (`builder-revision.json`), so a runtime built from different
 inputs is always rebuilt rather than reused.
 
+## [0.1.9] - 2026-11-11
+
+- Improved performance: OpenGL work now runs on its own thread, so parsing the next frame overlaps drawing the current one (about 13% higher frame rate in gameplay at a 120 FPS limit, identical rendering). Set `NWII_NO_RENDER_QUEUE=1` or turn on safe GPU sync to draw on the main thread as before.
+- Improved performance: the USA release is built with a profile-guided compile of the hot guest code (about 5% higher frame rate). The PAL release has no profile yet and builds as before.
+- Host writes to guest memory no longer take a trap in the paths that previously did.
+- Fixed a hang in the GL thread on a cold start: the present-time GX drain is now served by the front end, not by the GL thread.
+
 ## [0.1.8] - 2026-11-06
 
 - Improved performance: GX matrix uploads now write straight to the GPU FIFO instead of trapping on every store (about 40% higher frame rate in gameplay at a 120 FPS limit).

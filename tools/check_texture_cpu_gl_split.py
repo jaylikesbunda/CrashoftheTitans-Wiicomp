@@ -165,7 +165,7 @@ def main():
 
     # 5. pairing: one record per DrawPrimitive, in both the prepass and the draw block
     draws_visited = len(re.findall(r'e\.kind == \(uint8_t\)GXCommandType::DrawPrimitive', walk))
-    records_pushed = len(re.findall(r's_draw_textures\.push_back\(draw\)', walk))
+    records_pushed = len(re.findall(r'\bdraws\.push_back\(draw\)', walk))   # the records go to this drain's slot of the draw-list ring
     check(draws_visited == 1 and records_pushed == 1, 'prepass pushes one record per DrawPrimitive entry')
     consumed = len(re.findall(r's_draw_index\+\+|\+\+s_draw_index', rn))
     check(consumed == 1, 'draw block consumes one record per DrawPrimitive')

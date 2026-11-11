@@ -215,8 +215,13 @@ edit(MAIN, '      if (!headless) {\n        glBindFramebuffer(GL_FRAMEBUFFER, 0)
      '        glBindFramebuffer(GL_FRAMEBUFFER, 0);\n        int draw_w = 0, draw_h = 0;', 1, 'main:frame_open')
 edit(MAIN, '        }\n      }\n\n      // audio is pulled by the SDL callback (NATIVE_AUDIO_JITTER_BUFFER_V1)',
      '        }\n      };\n'
-     '      if (nwii::runtime::render_queue::Active()) nwii::runtime::render_queue::Post(frame_work); else frame_work(); // ' + MARK + '\n'
+     '      if (nwii::runtime::render_queue::Active()) { // ' + MARK + ': the front end serves a pending drain before the frame task is posted; the task runs on the GL thread, which must not submit to its own queue\n'
+     '        if(std::getenv("NWII_OFFSCREEN")==nullptr) service_gx_drain_before_host("host.drain_before_present_front");\n'
+     '        nwii::runtime::render_queue::Post(frame_work);\n'
+     '      } else frame_work();\n'
      '      }\n\n      // audio is pulled by the SDL callback (NATIVE_AUDIO_JITTER_BUFFER_V1)', 1, 'main:frame_close')
+edit(MAIN, 'if(std::getenv("NWII_OFFSCREEN")==nullptr) service_gx_drain_before_host("host.drain_before_present");',
+     'if(!nwii::runtime::render_queue::Active() && std::getenv("NWII_OFFSCREEN")==nullptr) service_gx_drain_before_host("host.drain_before_present"); /* ' + MARK + ': in queue mode this closure runs on the GL thread; the front end serves the drain before Post */', 1, 'main:present_drain')
 edit(MAIN, 'if(window)SDL_SetWindowTitle(window,title);',
      'if(window){if(nwii::runtime::render_queue::Active())nwii::runtime::render_queue::SetTitle(title);else SDL_SetWindowTitle(window,title);}', 1, 'main:title')
 edit(MAIN, '\n  if (headless) {\n',

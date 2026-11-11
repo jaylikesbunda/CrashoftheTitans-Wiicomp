@@ -110,6 +110,12 @@ def ordering(rt):
                          (rt / 'src/hle/texture_cache_gl.cpp').read_text(encoding='utf-8', errors='replace'))),
           'prompt glyph textures are made on the GL thread by resolve_texture')
     mn = (rt / 'src/core/main.cpp').read_text(encoding='utf-8', errors='replace')
+    # The frame task runs on the GL thread in queue mode. A drain served there would submit to the queue it is draining: the
+    # GL thread waits for a free slot that only it can free. The present-time drain is served by the front end before Post.
+    check('if(!nwii::runtime::render_queue::Active() && std::getenv("NWII_OFFSCREEN")==nullptr) service_gx_drain_before_host("host.drain_before_present")' in mn,
+          'the frame task does not serve a drain in queue mode (the GL thread must not submit to its own queue)')
+    check(bool(re.search(r'service_gx_drain_before_host\("host\.drain_before_present_front"\);\s*nwii::runtime::render_queue::Post\(frame_work\)', mn)),
+          'the front end serves the pending drain before it posts the frame task')
     check('render_queue::Start(' in mn and mn.index('render_queue::Start(') < mn.index('\n  if (headless) {\n'),
           'main starts the GL thread before the loop')
     check('render_queue::Stop(); // NATIVE_RENDER_QUEUE_V1' in mn and mn.index('render_queue::Stop(); // NATIVE_RENDER_QUEUE_V1') < mn.index('SDL_GL_DeleteContext(gl_ctx);'),

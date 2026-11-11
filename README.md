@@ -14,8 +14,8 @@
 [![Get it on RecompLauncher](https://recomplauncher.com/assets/press/launcher/badge-dark.svg)](https://recomplauncher.com/game/crashofthetitans-wiicomp)
 
 The game's code is translated from PowerPC to C++ with [NWiiRecomp](https://github.com/BlackLineInteractive/NWiiRecomp)
-and compiled with a high-level Wii runtime into a native program. It is not an emulator. Launcher `0.1.8`,
-builder `2026.11.06-2`. See [CHANGELOG.md](CHANGELOG.md).
+and compiled with a high-level Wii runtime into a native program. It is not an emulator. Launcher `0.1.9`,
+builder `2026.11.11-1`. See [CHANGELOG.md](CHANGELOG.md).
 
 | Release | Disc ID | Status |
 | --- | --- | --- |
